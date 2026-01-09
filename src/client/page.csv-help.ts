@@ -230,8 +230,7 @@ export class SpinderCsvHelpPage extends SpinderAppProvider {
       this.dispatchEvent(new UpdateTransactionsEvent({ transactions: allTransactions }));
 
       // Navigate back to home page
-      window.history.pushState({}, "", "/");
-      window.dispatchEvent(new PopStateEvent("popstate"));
+      window.location.href = "/";
     } catch (error) {
       console.error("Error loading sample data:", error);
       alert("Failed to load sample data. Please try again.");
