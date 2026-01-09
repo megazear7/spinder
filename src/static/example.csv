@@ -1,0 +1,116 @@
+Details,Posting Date,Description,Amount,Type,Balance,Check or Slip Number
+Transaction 1,2024-01-15,Sword sharpening and polishing,-45.99,Debit,954.01,CHK001
+Transaction 2,2024-01-16,Armor repair (dragon claw marks),-120.50,Debit,833.51,CHK002
+Transaction 3,2024-01-17,Horse feed and dragon-resistant horseshoes,-78.25,Debit,755.26,CHK003
+Transaction 4,2024-01-18,Tavern meals (liquid courage),-32.75,Debit,722.51,CHK004
+Transaction 5,2024-01-19,Dragon-slaying insurance premium,-250.00,Debit,472.51,CHK005
+Transaction 6,2024-01-20,Magic potion (fire resistance),-89.99,Debit,382.52,CHK006
+Transaction 7,2024-01-21,Arrow supplies (dragon scale piercing),-56.40,Debit,326.12,CHK007
+Transaction 8,2024-01-22,Castle cleaning (post-dragon cleanup),-145.75,Debit,180.37,CHK008
+Transaction 9,2024-01-23,Herald fees (quest announcement),-25.00,Debit,155.37,CHK009
+Transaction 10,2024-01-24,Dragon bait (sheep and treasure),-67.50,Debit,87.87,CHK010
+Transaction 11,2024-01-25,Tournament prize money,500.00,Credit,587.87,DEP011
+Transaction 12,2024-01-26,Enchanted sword polish,-15.50,Debit,572.37,CHK012
+Transaction 13,2024-01-27,Dragon scale armor plating,-89.99,Debit,482.38,CHK013
+Transaction 14,2024-01-28,Unicorn hair bow strings,-42.25,Debit,440.13,CHK014
+Transaction 15,2024-01-29,Phoenix feather quills,-28.75,Debit,411.38,CHK015
+Transaction 16,2024-01-30,Mermaid scale mail repair,-156.40,Debit,254.98,CHK016
+Transaction 17,2024-01-31,Griffin talon sword grips,-67.50,Debit,187.48,CHK017
+Transaction 18,2024-02-01,Basilisk venom antidote,-199.99,Debit,-12.51,CHK018
+Transaction 19,2024-02-02,Quest reward payment,750.00,Credit,737.49,DEP019
+Transaction 20,2024-02-03,Troll strength potion,-89.50,Debit,647.99,CHK020
+Transaction 21,2024-02-04,Elf archery master lessons,-125.00,Debit,522.99,CHK021
+Transaction 22,2024-02-05,Dwarf smithing consultation,-75.25,Debit,447.74,CHK022
+Transaction 23,2024-02-06,Wizard spell components,-234.99,Debit,212.75,CHK023
+Transaction 24,2024-02-07,Fairy dust for good luck,-45.99,Debit,166.76,CHK024
+Transaction 25,2024-02-08,Giant spider silk rope,-112.50,Debit,54.26,CHK025
+Transaction 26,2024-02-09,Minotaur horn trumpet,-88.75,Debit,-34.49,CHK026
+Transaction 27,2024-02-10,Pegasus flight training,-299.99,Debit,-334.48,CHK027
+Transaction 28,2024-02-11,Centaur archery contest entry,-50.00,Debit,-384.48,CHK028
+Transaction 29,2024-02-12,Dragon fire insurance premium,-450.00,Debit,-834.48,CHK029
+Transaction 30,2024-02-13,Quest completion bounty,-1000.00,Debit,-1834.48,CHK030
+Transaction 31,2024-02-14,Royal banquet tickets,-85.50,Debit,-1919.98,CHK031
+Transaction 32,2024-02-15,Knight's guild membership dues,-150.00,Debit,-2069.98,CHK032
+Transaction 33,2024-02-16,Enchanted horse shoes,-178.25,Debit,-2248.23,CHK033
+Transaction 34,2024-02-17,Magic mirror scrying service,-67.99,Debit,-2316.22,CHK034
+Transaction 35,2024-02-18,Crystal ball consultation,-125.75,Debit,-2441.97,CHK035
+Transaction 36,2024-02-19,Dragon breath protection charm,-89.99,Debit,-2531.96,CHK036
+Transaction 37,2024-02-20,Medieval tax payment,-200.00,Debit,-2731.96,CHK037
+Transaction 38,2024-02-21,Tournament entry fee,-75.00,Debit,-2806.96,CHK038
+Transaction 39,2024-02-22,Jousting lance replacement,-45.50,Debit,-2852.46,CHK039
+Transaction 40,2024-02-23,Herbal healing potions,-156.25,Debit,-3008.71,CHK040
+Transaction 41,2024-02-24,Alchemy lab supplies,-234.99,Debit,-3243.70,CHK041
+Transaction 42,2024-02-25,Teleportation scroll,-399.99,Debit,-3643.69,CHK042
+Transaction 43,2024-02-26,Invisibility cloak repair,-299.50,Debit,-3943.19,CHK043
+Transaction 44,2024-02-27,Flying carpet maintenance,-145.75,Debit,-4088.94,CHK044
+Transaction 45,2024-02-28,Magic carpet cleaning,-25.99,Debit,-4114.93,CHK045
+Transaction 46,2024-02-29,Time travel hourglass,-999.99,Debit,-5114.92,CHK046
+Transaction 47,2024-03-01,Dragon egg incubator,-189.50,Debit,-5304.42,CHK047
+Transaction 48,2024-03-02,Griffin feather pillow,-67.25,Debit,-5371.67,CHK048
+Transaction 49,2024-03-03,Phoenix rebirth insurance,-350.00,Debit,-5721.67,CHK049
+Transaction 50,2024-03-04,Mermaid singing lessons,-125.99,Debit,-5847.66,CHK050
+Transaction 51,2024-03-05,Siren call protection wax,-15.75,Debit,-5863.41,CHK051
+Transaction 52,2024-03-06,Giant's strength gauntlets,-445.50,Debit,-6308.91,CHK052
+Transaction 53,2024-03-07,Dwarf battle axe sharpening,-89.25,Debit,-6398.16,CHK053
+Transaction 54,2024-03-08,Elf leaf armor weave,-267.99,Debit,-6666.15,CHK054
+Transaction 55,2024-03-09,Werewolf transformation cure,-499.99,Debit,-7166.14,CHK055
+Transaction 56,2024-03-10,Vampire garlic necklace,-34.50,Debit,-7200.64,CHK056
+Transaction 57,2024-03-11,Zombie plague vaccine,-299.75,Debit,-7500.39,CHK057
+Transaction 58,2024-03-12,Ghost banishment ritual,-189.99,Debit,-7690.38,CHK058
+Transaction 59,2024-03-13,Poltergeist containment box,-145.25,Debit,-7835.63,CHK059
+Transaction 60,2024-03-14,Medusa gaze protection,-234.50,Debit,-8070.13,CHK060
+Transaction 61,2024-03-15,Cerberus three-headed dog treats,-45.99,Debit,-8116.12,CHK061
+Transaction 62,2024-03-16,Hydra head regrowth prevention,-678.25,Debit,-8794.37,CHK062
+Transaction 63,2024-03-17,Kraken tentacle hooks,-156.75,Debit,-8951.12,CHK063
+Transaction 64,2024-03-18,Leviathan scale polish,-89.99,Debit,-9041.11,CHK064
+Transaction 65,2024-03-19,Sea serpent oil,-67.50,Debit,-9108.61,CHK065
+Transaction 66,2024-03-20,Storm giant beard comb,-23.75,Debit,-9132.36,CHK066
+Transaction 67,2024-03-21,Frost giant ice pick,-145.99,Debit,-9278.35,CHK067
+Transaction 68,2024-03-22,Fire elemental extinguisher,-199.50,Debit,-9477.85,CHK068
+Transaction 69,2024-03-23,Earth elemental grounding rod,-134.25,Debit,-9612.10,CHK069
+Transaction 70,2024-03-24,Air elemental wind socks,-45.75,Debit,-9657.85,CHK070
+Transaction 71,2024-03-25,Water elemental raincoat,-89.99,Debit,-9747.84,CHK071
+Transaction 72,2024-03-26,Lightning rod for wizards,-234.50,Debit,-9982.34,CHK072
+Transaction 73,2024-03-27,Magic wand recharging,-67.25,Debit,-10049.59,CHK073
+Transaction 74,2024-03-28,Spellbook page replacement,-156.99,Debit,-10206.58,CHK074
+Transaction 75,2024-03-29,Alchemy transmutation fee,-445.75,Debit,-10652.33,CHK075
+Transaction 76,2024-03-30,Potion bottle recycling,-12.50,Debit,-10664.83,CHK076
+Transaction 77,2024-03-31,Enchanted ink for scrolls,-78.99,Debit,-10743.82,CHK077
+Transaction 78,2024-04-01,Rune stone carving,-189.25,Debit,-10933.07,CHK078
+Transaction 79,2024-04-02,Celestial navigation charts,-299.99,Debit,-11233.06,CHK079
+Transaction 80,2024-04-03,Astral projection lessons,-399.50,Debit,-11632.56,CHK080
+Transaction 81,2024-04-04,Dream walking guide,-145.75,Debit,-11778.31,CHK081
+Transaction 82,2024-04-05,Nightmare protection amulet,-234.99,Debit,-12013.30,CHK082
+Transaction 83,2024-04-06,Prophecy interpretation,-199.25,Debit,-12212.55,CHK083
+Transaction 84,2024-04-07,Oracle consultation fee,-299.99,Debit,-12512.54,CHK084
+Transaction 85,2024-04-08,Fate weaving thread,-67.50,Debit,-12580.04,CHK085
+Transaction 86,2024-04-09,Time crystal polishing,-145.25,Debit,-12725.29,CHK086
+Transaction 87,2024-04-10,Dimensional anchor,-999.99,Debit,-13725.28,CHK087
+Transaction 88,2024-04-11,Portal key duplication,-189.50,Debit,-13914.78,CHK088
+Transaction 89,2024-04-12,Shadow realm flashlight,-89.75,Debit,-14004.53,CHK089
+Transaction 90,2024-04-13,Mirror dimension cleaner,-45.99,Debit,-14050.52,CHK090
+Transaction 91,2024-04-14,Alternate universe translator,-345.25,Debit,-14395.77,CHK091
+Transaction 92,2024-04-15,Quantum entanglement ring,-799.99,Debit,-15195.76,CHK092
+Transaction 93,2024-04-16,Probability manipulation dice,-156.50,Debit,-15352.26,CHK093
+Transaction 94,2024-04-17,Luck manipulation charm,-234.75,Debit,-15587.01,CHK094
+Transaction 95,2024-04-18,Chaos magic stabilizer,-445.99,Debit,-16032.99,CHK095
+Transaction 96,2024-04-19,Order magic harmonizer,-378.25,Debit,-16411.24,CHK096
+Transaction 97,2024-04-20,Elemental balance scales,-199.50,Debit,-16610.74,CHK097
+Transaction 98,2024-04-21,Mana crystal recharging,-145.75,Debit,-16756.49,CHK098
+Transaction 99,2024-04-22,Spirit guide summoning,-299.99,Debit,-17056.48,CHK099
+Transaction 100,2024-04-23,Ancestral weapon blessing,-189.25,Debit,-17245.73,CHK100
+Transaction 101,2024-04-24,Heroic deed notarization,-75.50,Debit,-17321.23,CHK101
+Transaction 102,2024-04-25,Legendary status application,-999.99,Debit,-18321.22,CHK102
+Transaction 103,2024-04-26,Mythical creature veterinary,-345.75,Debit,-18666.97,CHK103
+Transaction 104,2024-04-27,Dragon language lessons,-299.50,Debit,-18966.47,CHK104
+Transaction 105,2024-04-28,Phoenix feather cleaning,-67.25,Debit,-19033.72,CHK105
+Transaction 106,2024-04-29,Unicorn horn sharpening,-189.99,Debit,-19223.71,CHK106
+Transaction 107,2024-04-30,Griffin wing clipping,-145.50,Debit,-19369.21,CHK107
+Transaction 108,2024-05-01,Pegasus horseshoe blessing,-234.25,Debit,-19603.46,CHK108
+Transaction 109,2024-05-02,Centaur bow restringing,-89.75,Debit,-19693.21,CHK109
+Transaction 110,2024-05-03,Minotaur maze navigation,-156.99,Debit,-19850.20,CHK110
+Transaction 111,2024-05-04,Basilisk eye protection,-199.25,Debit,-20049.45,CHK111
+Transaction 112,2024-05-05,Troll bridge toll,-25.00,Debit,-20074.45,CHK112
+Transaction 113,2024-05-06,Knight's pension payment,300.00,Credit,-19774.45,DEP113
+Transaction 114,2024-05-07,Royal treasury stipend,400.00,Credit,-19374.45,DEP114
+Transaction 115,2024-05-08,Dragon hoard share,1200.00,Credit,-18174.45,DEP115
