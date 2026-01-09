@@ -1,6 +1,6 @@
-# ZeltTemplate
+# Spinder
 
-This project was built with the [Zelt Template](https://github.com/megazear7/zelt-stack-template)
+Spinder is a client only web app that allows you to more easily understand your expenses.
 
 ## Setup
 
@@ -24,5 +24,16 @@ npm start
 ## Lint & Fix
 
 ```
-npm fix
+npm run lint
+npm run fix
 ```
+
+## Build
+
+```
+npm run build
+```
+
+## Deploy
+
+Push to the `main` branch.
