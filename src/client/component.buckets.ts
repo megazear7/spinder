@@ -559,6 +559,7 @@ export class SpinderBuckets extends LitElement {
 
         <div class="bucket add-bucket" @click=${this.handleAddBucket}>
           <div class="add-icon">${plusIcon}</div>
+          <div>Add Bucket</div>
         </div>
       </div>
 

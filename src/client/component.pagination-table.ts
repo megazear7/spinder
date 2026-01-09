@@ -14,6 +14,7 @@ import { Transaction } from "../shared/type.transaction.js";
 import { searchTransactions } from "./util.transaction.js";
 import { UpdateBucketFilterEvent } from "./event.update-bucket-filter.js";
 import { formatCurrency } from "../shared/util.math.js";
+import "./component.sample-csv.js";
 
 @customElement("spinder-pagination-table")
 export class SpinderPaginationTable extends LitElement {
@@ -343,7 +344,7 @@ export class SpinderPaginationTable extends LitElement {
         <div class="container">
           <div class="empty-state">
             <h3>No transactions loaded</h3>
-            <p>Upload a CSV file to view your transaction data</p>
+            <spinder-sample-csv></spinder-sample-csv>
           </div>
         </div>
       `;
