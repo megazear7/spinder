@@ -1,6 +1,8 @@
 import { css, html, LitElement, TemplateResult } from "lit";
 import { customElement } from "lit/decorators.js";
 import { globalStyles } from "./styles.global.js";
+import { saveTransactions } from "./util.transaction.js";
+import { UpdateTransactionsEvent } from "./event.update-transactions.js";
 
 @customElement("spinder-footer")
 export class SpinderFooter extends LitElement {
@@ -74,6 +76,7 @@ export class SpinderFooter extends LitElement {
           <div class="footer-links">
             <a href="/csv-help" class="footer-link internal">CSV Upload Help</a>
             <a href="/security" class="footer-link internal">Security & Privacy</a>
+            <a href="#" class="footer-link" @click=${this.clearAllTransactions}>Clear All Transactions</a>
             <a
               href="https://www.alexlockhart.me/"
               target="_blank"
@@ -92,5 +95,13 @@ export class SpinderFooter extends LitElement {
         </div>
       </footer>
     `;
+  }
+
+  private clearAllTransactions(event: Event): void {
+    event.preventDefault();
+    if (confirm("Are you sure you want to clear all transactions? This action cannot be undone.")) {
+      saveTransactions([]);
+      this.dispatchEvent(new UpdateTransactionsEvent({ transactions: [] }));
+    }
   }
 }

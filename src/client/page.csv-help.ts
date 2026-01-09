@@ -62,7 +62,9 @@ export class SpinderCsvHelpPage extends LitElement {
         <p>
           To import your financial transactions into Spinder, you can upload a CSV file containing your transaction
           data. This allows you to easily bring in data from your bank statements or other financial records. The CSV
-          format is the standard CSV download format that Chase bank provides through its web interface.
+          format is the standard CSV download format that Chase bank provides through its web interface. You can
+          <a href="/example.csv" download="sample-transactions.csv">download a sample CSV file</a> to see the expected
+          format.
         </p>
 
         <h2>Required CSV Columns</h2>
