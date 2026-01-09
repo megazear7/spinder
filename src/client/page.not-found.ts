@@ -11,6 +11,26 @@ export class SpinderNotFoundPage extends LitElement {
         text-align: center;
         padding: var(--size-large);
       }
+
+      .btn {
+        padding: var(--size-medium) var(--size-large);
+        border: none;
+        border-radius: var(--border-radius-medium);
+        font-size: var(--font-medium);
+        font-weight: var(--font-weight-medium);
+        cursor: pointer;
+        transition: var(--transition-all);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--size-small);
+        background: var(--color-accent);
+        color: var(--color-white);
+      }
+
+      .btn:hover {
+        background: var(--color-accent-dark);
+      }
     `,
   ];
 
@@ -18,8 +38,13 @@ export class SpinderNotFoundPage extends LitElement {
     return html`
       <main>
         <h1>Not Found!</h1>
+        <button class="btn" @click=${this.goHome}>Go to Home Page</button>
       </main>
       <spinder-footer></spinder-footer>
     `;
+  }
+
+  private goHome(): void {
+    window.location.href = "/";
   }
 }
