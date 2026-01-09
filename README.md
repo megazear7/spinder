@@ -1,5 +1,7 @@
 # Spinder
 
+[spinder.alexlockhart.me](https://spinder.alexlockhart.me/)
+
 Spinder is a client only web app that allows you to more easily understand your expenses.
 
 ## Setup

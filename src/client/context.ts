@@ -13,7 +13,7 @@ export const transactionContext = createContext<TransactionContext>("transaction
 
 export const BucketFilterContext = z.object({
   name: z.string(),
-  filterText: z.string(),
+  filterTexts: z.array(z.string()),
 });
 export type BucketFilterContext = z.infer<typeof BucketFilterContext>;
 export const bucketFilterContext = createContext<BucketFilterContext>("bucket-filter");

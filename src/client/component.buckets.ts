@@ -401,10 +401,8 @@ export class SpinderBuckets extends LitElement {
   }
 
   private handleBucketClick(bucket: BucketWithData): void {
-    // For bucket clicks, we'll use the first filter text as the primary filter
-    // This maintains backward compatibility with the single filter expectation
-    const primaryFilter = bucket.filterTexts.length > 0 ? bucket.filterTexts[0] : "";
-    this.dispatchEvent(new UpdateBucketFilterEvent(primaryFilter, bucket.name));
+    // For bucket clicks, we'll use all filter texts for comprehensive filtering
+    this.dispatchEvent(new UpdateBucketFilterEvent(bucket.filterTexts, bucket.name));
   }
 
   private handleAddBucket(): void {
@@ -500,12 +498,7 @@ export class SpinderBuckets extends LitElement {
     if (!this.bucketFilterContext) return false;
 
     // Check if the bucket's name matches the filter context name
-    if (this.bucketFilterContext.name === bucket.name) return true;
-
-    // Check if any of the bucket's filter texts match the current filter
-    return bucket.filterTexts.some((filterText) =>
-      this.bucketFilterContext!.filterText.toLowerCase().includes(filterText.toLowerCase()),
-    );
+    return this.bucketFilterContext.name === bucket.name;
   }
 
   override render(): TemplateResult {

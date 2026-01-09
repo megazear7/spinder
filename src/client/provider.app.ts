@@ -26,7 +26,7 @@ export abstract class SpinderAppProvider extends SpinderAbstractProvider {
   @property({ attribute: false })
   bucketFilterContext: BucketFilterContext = {
     name: "",
-    filterText: "",
+    filterTexts: [],
   };
 
   @provide({ context: timeFilterContext })
@@ -69,7 +69,7 @@ export abstract class SpinderAppProvider extends SpinderAbstractProvider {
     const updateEvent = event as UpdateBucketFilterEvent;
     this.bucketFilterContext = {
       name: updateEvent.name,
-      filterText: updateEvent.filterText,
+      filterTexts: updateEvent.filterTexts,
     };
   };
 

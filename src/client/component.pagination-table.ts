@@ -21,7 +21,7 @@ export class SpinderPaginationTable extends LitElement {
     globalStyles,
     css`
       .container {
-        margin: var(--size-large) 0;
+        margin: var(--size-large) 0 var(--size-3x) 0;
       }
 
       .search-container {
@@ -120,7 +120,7 @@ export class SpinderPaginationTable extends LitElement {
       }
 
       th {
-        background: linear-gradient(135deg, var(--color-2-dark) 0%, var(--color-2) 100%);
+        background: var(--color-2-dark);
         color: var(--color-white);
         font-weight: var(--font-weight-semibold);
         font-size: var(--font-small);
@@ -275,9 +275,11 @@ export class SpinderPaginationTable extends LitElement {
     let transactions = this.transactionContext.transactions;
 
     // Apply bucket filter first (if it exists)
-    if (this.bucketFilterContext?.filterText && this.bucketFilterContext.filterText.trim()) {
+    if (this.bucketFilterContext?.filterTexts && this.bucketFilterContext.filterTexts.length > 0) {
       transactions = transactions.filter((tx) =>
-        tx.description.toLowerCase().includes(this.bucketFilterContext!.filterText.toLowerCase()),
+        this.bucketFilterContext!.filterTexts.some((filterText) =>
+          tx.description.toLowerCase().includes(filterText.toLowerCase()),
+        ),
       );
     }
 
@@ -324,7 +326,7 @@ export class SpinderPaginationTable extends LitElement {
   }
 
   private clearBucketFilter(): void {
-    this.dispatchEvent(new UpdateBucketFilterEvent("", ""));
+    this.dispatchEvent(new UpdateBucketFilterEvent([], ""));
   }
 
   private handlePageChange(page: number): void {
@@ -353,23 +355,23 @@ export class SpinderPaginationTable extends LitElement {
           <input
             type="text"
             class="search-input"
-            placeholder=${this.bucketFilterContext?.filterText
+            placeholder=${this.bucketFilterContext?.name
               ? `Search within "${this.bucketFilterContext.name}" bucket...`
               : "Search transactions..."}
             .value=${this.searchQuery}
             @input=${this.handleSearchChange} />
-          ${this.bucketFilterContext?.filterText
+          ${this.bucketFilterContext?.name
             ? html`
                 <div class="filter-indicator">
-                  <span>Filtering: "${this.bucketFilterContext.filterText}"</span>
+                  <span>Filtering: "${this.bucketFilterContext.name}" bucket</span>
                   <button class="clear-filter-btn" @click=${this.clearBucketFilter} title="Clear bucket filter">
                     ✕
                   </button>
                 </div>
               `
             : ""}
-          <div class="summary spend">Total: ${formatCurrency(this.totalAmountSpend)}</div>
-          <div class="summary income">Total: ${formatCurrency(this.totalAmountIncome)}</div>
+          <div class="summary spend">Expenses: ${formatCurrency(this.totalAmountSpend)}</div>
+          <div class="summary income">Income: ${formatCurrency(this.totalAmountIncome)}</div>
         </div>
 
         <div class="table-container">
