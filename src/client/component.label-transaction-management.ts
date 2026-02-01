@@ -214,7 +214,7 @@ export class SpinderLabelTransactionManagement extends LitElement {
   }
 
   override updated(changedProperties: PropertyValues): void {
-    if (changedProperties.has('transaction')) {
+    if (changedProperties.has("transaction")) {
       this.modal.open();
     }
   }
@@ -350,7 +350,7 @@ export class SpinderLabelTransactionManagement extends LitElement {
               <button
                 class="create-add-btn"
                 ?disabled=${!this.newLabelName.trim() || this.isNameTaken(this.newLabelName)}
-                title=${this.isNameTaken(this.newLabelName) ? 'A label with this name already exists' : ''}
+                title=${this.isNameTaken(this.newLabelName) ? "A label with this name already exists" : ""}
                 @click=${this.createAndAddLabel}>
                 Create and Add
               </button>

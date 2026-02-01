@@ -382,7 +382,9 @@ export class SpinderPaginationTable extends LitElement {
 
     if (labels.length === 1) {
       return html`
-        <span class="label-display" @click=${() => this.applyLabelFilter(labels[0])}>${toTitleCase(labels[0].name)}</span>
+        <span class="label-display" @click=${() => this.applyLabelFilter(labels[0])}>
+          ${toTitleCase(labels[0].name)}
+        </span>
         <button class="label-btn" @click=${() => this.openLabelModal(transaction)}>+ label</button>
       `;
     }
@@ -392,7 +394,9 @@ export class SpinderPaginationTable extends LitElement {
     const remainingCount = labels.length - 1;
 
     return html`
-      <span class="label-display" @click=${() => this.applyLabelFilter(firstLabel)}>${toTitleCase(firstLabel.name)}</span>
+      <span class="label-display" @click=${() => this.applyLabelFilter(firstLabel)}>
+        ${toTitleCase(firstLabel.name)}
+      </span>
       <button class="label-btn" @click=${() => this.openLabelModal(transaction)}>+${remainingCount} more</button>
     `;
   }

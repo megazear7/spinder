@@ -277,7 +277,9 @@ export class SpinderFilters extends LitElement {
           <option value="">Select label...</option>
           ${this.availableLabels.map(
             (label) => html`
-              <option value=${label.id} ?selected=${this.selectedLabelId === label.id}>${toTitleCase(label.name)}</option>
+              <option value=${label.id} ?selected=${this.selectedLabelId === label.id}>
+                ${toTitleCase(label.name)}
+              </option>
             `,
           )}
         </select>
