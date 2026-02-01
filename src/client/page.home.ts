@@ -5,7 +5,7 @@ import { SpinderAppProvider } from "./provider.app.js";
 import "./component.csv-upload.js";
 import "./component.pagination-table.js";
 import "./component.buckets.js";
-import "./component.time.js";
+import "./component.filters.js";
 import "./component.footer.js";
 
 @customElement("spinder-home-page")
@@ -27,7 +27,7 @@ export class SpinderHomePage extends SpinderAppProvider {
     return html`
       <main>
         <h1 title="Spinder"><img src="logo/logo-text.png" /></h1>
-        <spinder-time></spinder-time>
+        <spinder-filters></spinder-filters>
         <spinder-csv-upload></spinder-csv-upload>
         <spinder-buckets></spinder-buckets>
         <spinder-pagination-table></spinder-pagination-table>

@@ -9,12 +9,19 @@ import {
   bucketFilterContext,
   TimeFilterContext,
   timeFilterContext,
+  LabelFilterContext,
+  labelFilterContext,
 } from "./context.js";
 import { Transaction } from "../shared/type.transaction.js";
 import { searchTransactions } from "./util.transaction.js";
 import { UpdateBucketFilterEvent } from "./event.update-bucket-filter.js";
+import { UpdateTransactionsEvent } from "./event.update-transactions.js";
 import { formatCurrency } from "../shared/util.math.js";
+import { getLabelsForTransaction, saveLabels, loadLabels, toTitleCase } from "./util.labels.js";
+import { UpdateLabelFilterEvent } from "./event.update-label-filter.js";
+import { Label } from "../shared/type.label.js";
 import "./component.sample-csv.js";
+import "./component.label-transaction-management.js";
 
 @customElement("spinder-pagination-table")
 export class SpinderPaginationTable extends LitElement {
@@ -215,6 +222,39 @@ export class SpinderPaginationTable extends LitElement {
         font-size: var(--font-large);
       }
 
+      .label-btn {
+        background: none;
+        border: none;
+        color: var(--color-primary-text-muted);
+        cursor: pointer;
+        font-size: var(--font-small);
+        padding: var(--size-small);
+        border-radius: var(--border-radius-medium);
+        transition: var(--transition-all);
+      }
+
+      .label-btn:hover {
+        background: var(--color-overlay-light);
+        color: var(--color-accent);
+      }
+
+      .label-display {
+        display: inline-block;
+        background: transparent;
+        color: var(--color-white);
+        padding: var(--size-small) var(--size-medium);
+        border-radius: var(--border-radius-medium);
+        font-size: var(--font-small);
+        margin-right: var(--size-small);
+        cursor: pointer;
+        transition: var(--transition-all);
+      }
+
+      .label-display:hover {
+        background: var(--color-accent);
+        transform: translateY(-1px);
+      }
+
       /* Responsive design */
       @media (max-width: 768px) {
         .container {
@@ -262,6 +302,10 @@ export class SpinderPaginationTable extends LitElement {
   @property({ attribute: false })
   timeFilterContext?: TimeFilterContext;
 
+  @consume({ context: labelFilterContext, subscribe: true })
+  @property({ attribute: false })
+  labelFilterContext?: LabelFilterContext;
+
   @state()
   private searchQuery = "";
 
@@ -294,6 +338,13 @@ export class SpinderPaginationTable extends LitElement {
       });
     }
 
+    // Apply label filter (if it exists)
+    if (this.labelFilterContext?.labelId) {
+      transactions = transactions.filter((tx) =>
+        tx.labels?.some((label) => label.id === this.labelFilterContext!.labelId),
+      );
+    }
+
     // Then apply search query
     if (this.searchQuery) {
       transactions = searchTransactions(transactions, this.searchQuery);
@@ -320,14 +371,105 @@ export class SpinderPaginationTable extends LitElement {
     return this.filteredTransactions.filter((t) => t.amount >= 0).reduce((sum, t) => sum + t.amount, 0);
   }
 
+  private renderLabelsCell(transaction: Transaction): TemplateResult {
+    const labels = getLabelsForTransaction(transaction);
+
+    if (labels.length === 0) {
+      return html`
+        <button class="label-btn" @click=${() => this.openLabelModal(transaction)}>+ label</button>
+      `;
+    }
+
+    if (labels.length === 1) {
+      return html`
+        <span class="label-display" @click=${() => this.applyLabelFilter(labels[0])}>${toTitleCase(labels[0].name)}</span>
+        <button class="label-btn" @click=${() => this.openLabelModal(transaction)}>+ label</button>
+      `;
+    }
+
+    // Multiple labels: show first one + "+X more" button
+    const firstLabel = labels[0];
+    const remainingCount = labels.length - 1;
+
+    return html`
+      <span class="label-display" @click=${() => this.applyLabelFilter(firstLabel)}>${toTitleCase(firstLabel.name)}</span>
+      <button class="label-btn" @click=${() => this.openLabelModal(transaction)}>+${remainingCount} more</button>
+    `;
+  }
+
+  @state()
+  private modalTransaction: Transaction | null = null;
+
+  @state()
+  private showLabelModal = false;
+
+  private openLabelModal(transaction: Transaction): void {
+    this.modalTransaction = transaction;
+    this.showLabelModal = true;
+  }
+
+  private closeLabelModal(): void {
+    this.showLabelModal = false;
+    this.modalTransaction = null;
+  }
+
+  private handleLabelsUpdated(event: CustomEvent): void {
+    if (!this.modalTransaction) return;
+
+    const { stagedLabels }: { stagedLabels: Label[] } = event.detail;
+    const updatedTransaction = {
+      ...this.modalTransaction,
+      labels: stagedLabels,
+    };
+
+    // Save any new labels that were created
+    const existingLabels = loadLabels();
+    const existingLabelIds = new Set(existingLabels.map((label) => label.id));
+    const newLabels = stagedLabels.filter((label: Label) => !existingLabelIds.has(label.id));
+
+    if (newLabels.length > 0) {
+      const updatedLabels = [...existingLabels, ...newLabels];
+      saveLabels(updatedLabels);
+    }
+
+    // Update the transaction in the context
+    if (this.transactionContext?.transactions) {
+      const updatedTransactions = this.transactionContext.transactions.map((tx) =>
+        tx === this.modalTransaction ? updatedTransaction : tx,
+      );
+      this.dispatchEvent(new UpdateTransactionsEvent({ transactions: updatedTransactions }));
+    }
+
+    this.closeLabelModal();
+  }
+
+  private applyLabelFilter(label: { id: string; name: string }): void {
+    this.dispatchEvent(new UpdateLabelFilterEvent(label.id, label.name));
+  }
+
   private handleSearchChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     this.searchQuery = input.value;
     this.currentPage = 1; // Reset to first page on search
   }
 
+  private getSearchPlaceholder(): string {
+    if (this.bucketFilterContext?.name && this.labelFilterContext?.labelName) {
+      return `Search within "${this.bucketFilterContext.name}" bucket and "${this.labelFilterContext.labelName}" label...`;
+    } else if (this.bucketFilterContext?.name) {
+      return `Search within "${this.bucketFilterContext.name}" bucket...`;
+    } else if (this.labelFilterContext?.labelName) {
+      return `Search within "${this.labelFilterContext.labelName}" label...`;
+    }
+    return "Search transactions...";
+  }
+
   private clearBucketFilter(): void {
     this.dispatchEvent(new UpdateBucketFilterEvent([], ""));
+  }
+
+  private clearLabelFilter(): void {
+    this.dispatchEvent(new UpdateLabelFilterEvent());
   }
 
   private handlePageChange(page: number): void {
@@ -356,9 +498,7 @@ export class SpinderPaginationTable extends LitElement {
           <input
             type="text"
             class="search-input"
-            placeholder=${this.bucketFilterContext?.name
-              ? `Search within "${this.bucketFilterContext.name}" bucket...`
-              : "Search transactions..."}
+            placeholder=${this.getSearchPlaceholder()}
             .value=${this.searchQuery}
             @input=${this.handleSearchChange} />
           ${this.bucketFilterContext?.name
@@ -368,6 +508,14 @@ export class SpinderPaginationTable extends LitElement {
                   <button class="clear-filter-btn" @click=${this.clearBucketFilter} title="Clear bucket filter">
                     ✕
                   </button>
+                </div>
+              `
+            : ""}
+          ${this.labelFilterContext?.labelName
+            ? html`
+                <div class="filter-indicator">
+                  <span>Filtering: "${this.labelFilterContext.labelName}" label</span>
+                  <button class="clear-filter-btn" @click=${this.clearLabelFilter} title="Clear label filter">✕</button>
                 </div>
               `
             : ""}
@@ -383,6 +531,7 @@ export class SpinderPaginationTable extends LitElement {
                 <th>Description</th>
                 <th>Amount</th>
                 <th>Balance</th>
+                <th>Labels</th>
               </tr>
             </thead>
             <tbody>
@@ -395,6 +544,7 @@ export class SpinderPaginationTable extends LitElement {
                       ${formatCurrency(transaction.amount)}
                     </td>
                     <td>${formatCurrency(parseFloat(transaction.balance || "0"))}</td>
+                    <td>${this.renderLabelsCell(transaction)}</td>
                   </tr>
                 `,
               )}
@@ -418,6 +568,15 @@ export class SpinderPaginationTable extends LitElement {
             `
           : ""}
       </div>
+
+      ${this.showLabelModal && this.modalTransaction
+        ? html`
+            <spinder-label-transaction-management
+              .transaction=${this.modalTransaction}
+              @labels-updated=${this.handleLabelsUpdated}
+              @modal-closed=${this.closeLabelModal}></spinder-label-transaction-management>
+          `
+        : ""}
     `;
   }
 }

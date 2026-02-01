@@ -47,6 +47,14 @@ export class SpinderModal extends LitElement {
         padding: 0 var(--size-large) var(--size-large) var(--size-large);
       }
 
+      .modal-footer {
+        padding: var(--size-large);
+        border-top: 1px solid var(--color-overlay-strong);
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--size-medium);
+      }
+
       .modal-backdrop.visible .modal-content {
         opacity: 1;
         transform: none;
@@ -129,6 +137,9 @@ export class SpinderModal extends LitElement {
           </div>
           <div class="modal-body">
             <slot name="body"></slot>
+          </div>
+          <div class="modal-footer">
+            <slot name="footer"></slot>
           </div>
         </div>
       </div>

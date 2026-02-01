@@ -7,6 +7,7 @@ import { SuccessEventData } from "./event.success.js";
 import { SaveEventData } from "./event.save.js";
 import { ModelClosingEventData } from "./event.modal-closing.js";
 import { ModelOpeningEventData } from "./event.modal-opening.js";
+import { UpdateLabelFilterEventData } from "./event.update-label-filter.js";
 
 export const SpinderEvent = z.union([
   ModelSubmitEventData,
@@ -17,6 +18,7 @@ export const SpinderEvent = z.union([
   WarningEventData,
   SuccessEventData,
   SaveEventData,
+  UpdateLabelFilterEventData,
 ]);
 export type SpinderEvent = z.infer<typeof SpinderEvent>;
 

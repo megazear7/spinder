@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Label } from "./type.label.js";
 
 export const Transaction = z.object({
   details: z.string(),
@@ -8,5 +9,6 @@ export const Transaction = z.object({
   type: z.string(),
   balance: z.string().optional(),
   checkOrSlipNumber: z.string().optional(),
+  labels: z.array(Label).optional(),
 });
 export type Transaction = z.infer<typeof Transaction>;

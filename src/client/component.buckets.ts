@@ -275,7 +275,7 @@ export class SpinderBuckets extends LitElement {
       }
 
       .btn-primary:hover {
-        background: var(--color-accent-hover);
+        background: var(--color-accent-dark);
       }
 
       .btn-secondary {

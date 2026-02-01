@@ -2,6 +2,8 @@ import { html, css, LitElement, TemplateResult } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { globalStyles } from "./styles.global.js";
 import { UpdateTimeFilterEvent } from "./event.update-time-filter.js";
+import { UpdateLabelFilterEvent } from "./event.update-label-filter.js";
+import { loadLabels, toTitleCase } from "./util.labels.js";
 import { calendarIcon, xIcon } from "./icons.js";
 
 type TimeRange = {
@@ -9,8 +11,8 @@ type TimeRange = {
   getRange: () => { start: Date; end: Date } | null;
 };
 
-@customElement("spinder-time")
-export class SpinderTime extends LitElement {
+@customElement("spinder-filters")
+export class SpinderFilters extends LitElement {
   static override styles = [
     globalStyles,
     css`
@@ -36,7 +38,7 @@ export class SpinderTime extends LitElement {
         flex: 1;
         padding: var(--size-small) var(--size-medium);
         border: 1px solid var(--color-overlay-strong);
-        border-radius: var(--border-radius-small);
+        border-radius: var(--border-radius-medium);
         background: var(--color-primary-surface);
         color: var(--color-primary-text);
         font-size: var(--font-medium);
@@ -52,13 +54,35 @@ export class SpinderTime extends LitElement {
         padding: var(--size-medium);
       }
 
-      .time-select:focus {
+      .label-select {
+        flex: 1;
+        padding: var(--size-small) var(--size-medium);
+        border: 1px solid var(--color-overlay-strong);
+        border-radius: var(--border-radius-medium);
+        background: var(--color-primary-surface);
+        color: var(--color-primary-text);
+        font-size: var(--font-medium);
+        cursor: pointer;
+        transition: var(--transition-all);
+        min-width: 150px;
+        appearance: none; /* Hide default arrow */
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right var(--size-medium) center;
+        background-size: 16px;
+        border-radius: var(--border-radius-medium);
+        padding: var(--size-medium);
+      }
+
+      .time-select:focus,
+      .label-select:focus {
         outline: none;
         border-color: var(--color-accent);
         box-shadow: 0 0 0 2px rgba(57, 167, 232, 0.2);
       }
 
-      .time-select:hover {
+      .time-select:hover,
+      .label-select:hover {
         border-color: var(--color-accent);
       }
 
@@ -67,7 +91,7 @@ export class SpinderTime extends LitElement {
         border: none;
         color: var(--color-primary-text-muted);
         cursor: pointer;
-        border-radius: var(--border-radius-small);
+        border-radius: var(--border-radius-medium);
         transition: var(--transition-all);
         font-size: var(--font-small);
         flex-shrink: 0;
@@ -92,6 +116,12 @@ export class SpinderTime extends LitElement {
 
   @state()
   private selectedRange: string = "Last 7 Days";
+
+  @state()
+  private selectedLabelId: string = "";
+
+  @state()
+  private availableLabels: { id: string; name: string }[] = [];
 
   private timeRanges: TimeRange[] = [
     {
@@ -177,6 +207,15 @@ export class SpinderTime extends LitElement {
     },
   ];
 
+  override connectedCallback(): void {
+    super.connectedCallback();
+    this.loadAvailableLabels();
+  }
+
+  private loadAvailableLabels(): void {
+    this.availableLabels = loadLabels();
+  }
+
   private handleRangeChange(event: Event): void {
     const select = event.target as HTMLSelectElement;
     const selectedLabel = select.value;
@@ -189,13 +228,28 @@ export class SpinderTime extends LitElement {
     }
   }
 
+  private handleLabelChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const selectedId = select.value;
+    this.selectedLabelId = selectedId;
+
+    const selectedLabel = this.availableLabels.find((label) => label.id === selectedId);
+    this.dispatchEvent(new UpdateLabelFilterEvent(selectedId || undefined, selectedLabel?.name));
+  }
+
   private handleClear(): void {
     this.selectedRange = "";
-    const select = this.shadowRoot?.querySelector(".time-select") as HTMLSelectElement;
-    if (select) {
-      select.value = "";
+    this.selectedLabelId = "";
+    const timeSelect = this.shadowRoot?.querySelector(".time-select") as HTMLSelectElement;
+    const labelSelect = this.shadowRoot?.querySelector(".label-select") as HTMLSelectElement;
+    if (timeSelect) {
+      timeSelect.value = "";
+    }
+    if (labelSelect) {
+      labelSelect.value = "";
     }
     this.dispatchEvent(new UpdateTimeFilterEvent(undefined, undefined, ""));
+    this.dispatchEvent(new UpdateLabelFilterEvent());
   }
 
   override firstUpdated(): void {
@@ -219,9 +273,17 @@ export class SpinderTime extends LitElement {
             `,
           )}
         </select>
-        ${this.selectedRange
+        <select class="label-select" @change=${this.handleLabelChange}>
+          <option value="">Select label...</option>
+          ${this.availableLabels.map(
+            (label) => html`
+              <option value=${label.id} ?selected=${this.selectedLabelId === label.id}>${toTitleCase(label.name)}</option>
+            `,
+          )}
+        </select>
+        ${this.selectedRange || this.selectedLabelId
           ? html`
-              <button class="clear-button" @click=${this.handleClear} title="Clear time filter">${xIcon}</button>
+              <button class="clear-button" @click=${this.handleClear} title="Clear all filters">${xIcon}</button>
             `
           : ""}
       </div>

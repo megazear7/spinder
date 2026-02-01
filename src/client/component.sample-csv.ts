@@ -4,6 +4,7 @@ import { SpinderAppProvider } from "./provider.app.js";
 import { globalStyles } from "./styles.global.js";
 import { loadTransactions, parseTransaction, addTransactions, saveTransactions } from "./util.transaction.js";
 import { saveBuckets } from "./util.buckets.js";
+import { createLabel, saveLabels, addLabelToTransaction } from "./util.labels.js";
 import { UpdateTransactionsEvent } from "./event.update-transactions.js";
 import { Transaction } from "../shared/type.transaction.js";
 import { Bucket } from "../shared/type.bucket.js";
@@ -131,8 +132,25 @@ export class SpinderSampleCsv extends SpinderAppProvider {
       // Save buckets
       saveBuckets(exampleBuckets);
 
+      // Load example labels
+      const exampleLabels = [
+        createLabel("Quest"),
+        createLabel("Armor"),
+        createLabel("Weapon"),
+        createLabel("Food"),
+        createLabel("Travel"),
+        createLabel("Reward"),
+      ];
+
+      // Save labels
+      saveLabels(exampleLabels);
+
+      // Assign labels to transactions based on their descriptions
+      const labeledTransactions = this.assignLabelsToTransactions(allTransactions, exampleLabels);
+      saveTransactions(labeledTransactions);
+
       // Update the transaction context
-      this.dispatchEvent(new UpdateTransactionsEvent({ transactions: allTransactions }));
+      this.dispatchEvent(new UpdateTransactionsEvent({ transactions: labeledTransactions }));
 
       // Navigate back to home page
       window.location.href = "/";
@@ -190,5 +208,108 @@ export class SpinderSampleCsv extends SpinderAppProvider {
     return distributedTransactions.sort(
       (a, b) => new Date(a.postingDate).getTime() - new Date(b.postingDate).getTime(),
     );
+  }
+
+  private assignLabelsToTransactions(
+    transactions: Transaction[],
+    labels: { id: string; name: string }[],
+  ): Transaction[] {
+    const labelMap = new Map<string, { id: string; name: string }>();
+    labels.forEach((label) => labelMap.set(label.name, label));
+
+    return transactions.map((transaction) => {
+      let labeledTransaction = transaction;
+
+      const description = transaction.description.toLowerCase();
+
+      // Quest-related transactions
+      if (
+        description.includes("quest") ||
+        description.includes("tournament") ||
+        description.includes("bounty") ||
+        description.includes("contest") ||
+        description.includes("guild")
+      ) {
+        const questLabel = labelMap.get("Quest");
+        if (questLabel) {
+          labeledTransaction = addLabelToTransaction(labeledTransaction, questLabel.id);
+        }
+      }
+
+      // Armor-related transactions
+      if (
+        description.includes("armor") ||
+        description.includes("mail") ||
+        description.includes("plate") ||
+        description.includes("cloak") ||
+        description.includes("shield")
+      ) {
+        const armorLabel = labelMap.get("Armor");
+        if (armorLabel) {
+          labeledTransaction = addLabelToTransaction(labeledTransaction, armorLabel.id);
+        }
+      }
+
+      // Weapon-related transactions
+      if (
+        description.includes("sword") ||
+        description.includes("arrow") ||
+        description.includes("lance") ||
+        description.includes("bow") ||
+        description.includes("weapon") ||
+        description.includes("talon") ||
+        description.includes("horn")
+      ) {
+        const weaponLabel = labelMap.get("Weapon");
+        if (weaponLabel) {
+          labeledTransaction = addLabelToTransaction(labeledTransaction, weaponLabel.id);
+        }
+      }
+
+      // Food-related transactions
+      if (
+        description.includes("meal") ||
+        description.includes("banquet") ||
+        description.includes("feed") ||
+        description.includes("tavern") ||
+        description.includes("food")
+      ) {
+        const foodLabel = labelMap.get("Food");
+        if (foodLabel) {
+          labeledTransaction = addLabelToTransaction(labeledTransaction, foodLabel.id);
+        }
+      }
+
+      // Travel-related transactions
+      if (
+        description.includes("horse") ||
+        description.includes("travel") ||
+        description.includes("teleport") ||
+        description.includes("carpet") ||
+        description.includes("flight") ||
+        description.includes("pegasus")
+      ) {
+        const travelLabel = labelMap.get("Travel");
+        if (travelLabel) {
+          labeledTransaction = addLabelToTransaction(labeledTransaction, travelLabel.id);
+        }
+      }
+
+      // Reward-related transactions (credits/positive amounts)
+      if (
+        transaction.type === "Credit" ||
+        description.includes("prize") ||
+        description.includes("reward") ||
+        description.includes("payment") ||
+        description.includes("bounty")
+      ) {
+        const rewardLabel = labelMap.get("Reward");
+        if (rewardLabel) {
+          labeledTransaction = addLabelToTransaction(labeledTransaction, rewardLabel.id);
+        }
+      }
+
+      return labeledTransaction;
+    });
   }
 }

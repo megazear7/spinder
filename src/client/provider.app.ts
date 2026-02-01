@@ -7,13 +7,16 @@ import {
   bucketFilterContext,
   TimeFilterContext,
   timeFilterContext,
+  LabelFilterContext,
+  labelFilterContext,
 } from "./context.js";
 import { LoadingStatus } from "../shared/type.loading.js";
 import { SpinderAbstractProvider } from "./provider.abstract.js";
-import { loadTransactions } from "./util.transaction.js";
+import { loadTransactions, saveTransactions } from "./util.transaction.js";
 import { UpdateTransactionsEvent } from "./event.update-transactions.js";
 import { UpdateBucketFilterEvent } from "./event.update-bucket-filter.js";
 import { UpdateTimeFilterEvent } from "./event.update-time-filter.js";
+import { UpdateLabelFilterEvent } from "./event.update-label-filter.js";
 
 export abstract class SpinderAppProvider extends SpinderAbstractProvider {
   @provide({ context: transactionContext })
@@ -42,12 +45,17 @@ export abstract class SpinderAppProvider extends SpinderAbstractProvider {
     };
   })();
 
+  @provide({ context: labelFilterContext })
+  @property({ attribute: false })
+  labelFilterContext: LabelFilterContext = {};
+
   override async connectedCallback(): Promise<void> {
     super.connectedCallback();
     this.load();
     this.addEventListener(UpdateTransactionsEvent.eventName, this.handleUpdateTransactionsEvent);
     this.addEventListener(UpdateBucketFilterEvent.eventName, this.handleUpdateBucketFilterEvent);
     this.addEventListener(UpdateTimeFilterEvent.eventName, this.handleUpdateTimeFilterEvent);
+    this.addEventListener(UpdateLabelFilterEvent.eventName, this.handleUpdateLabelFilterEvent);
   }
 
   async load(): Promise<void> {
@@ -63,6 +71,7 @@ export abstract class SpinderAppProvider extends SpinderAbstractProvider {
       transactions: updateEvent.detail.transactions,
       status: LoadingStatus.enum.success,
     };
+    saveTransactions(updateEvent.detail.transactions);
   };
 
   private handleUpdateBucketFilterEvent = (event: Event): void => {
@@ -79,6 +88,14 @@ export abstract class SpinderAppProvider extends SpinderAbstractProvider {
       startDate: updateEvent.startDate,
       endDate: updateEvent.endDate,
       label: updateEvent.label,
+    };
+  };
+
+  private handleUpdateLabelFilterEvent = (event: Event): void => {
+    const updateEvent = event as UpdateLabelFilterEvent;
+    this.labelFilterContext = {
+      labelId: updateEvent.detail.labelId,
+      labelName: updateEvent.detail.labelName,
     };
   };
 }

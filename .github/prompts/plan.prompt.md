@@ -23,4 +23,7 @@ description: 'Commit the current changes'
  - Do not proceed with any implementation until I confirm that the work plan is approved.
  - I may ask for changes to the `details.md` file before approving it. If so, make the updates to `details.md` and ask me to review it again. Keep repeating this step until I approve the work plan.
  - After completing these steps, run `npm run fix` to automatically fix any linting or formatting issues.
- - Do not try to run the development server as I will handle that myself.
+ - Try running `npm run build` to ensure there are no compilation errors.
+ - Keep iterating until all lint and build issues are resolved.
+ - Do NOT try to run the development server with `npm start` as I will handle that myself.
+ - Do not commit the changes as I will handle that myself.

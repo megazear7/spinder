@@ -25,3 +25,10 @@ export const TimeFilterContext = z.object({
 });
 export type TimeFilterContext = z.infer<typeof TimeFilterContext>;
 export const timeFilterContext = createContext<TimeFilterContext>("time-filter");
+
+export const LabelFilterContext = z.object({
+  labelId: z.string().optional(),
+  labelName: z.string().optional(),
+});
+export type LabelFilterContext = z.infer<typeof LabelFilterContext>;
+export const labelFilterContext = createContext<LabelFilterContext>("label-filter");
