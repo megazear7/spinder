@@ -57,8 +57,7 @@ export class SpinderSampleCsv extends SpinderAppProvider {
       <div style="margin-top: var(--size-xl); text-align: center;">
         <button class="btn btn-primary" @click=${this.handleLoadSampleData}>Load Sample Data</button>
         <p
-          style="margin-top: var(--size-medium); font-size: var(--font-small); color: var(--color-primary-text-muted);"
-        >
+          style="margin-top: var(--size-medium); font-size: var(--font-small); color: var(--color-primary-text-muted);">
           Try Spinder with sample knight expenses for slaying a dragon
         </p>
       </div>
