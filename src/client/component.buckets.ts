@@ -462,9 +462,11 @@ export class SpinderBuckets extends LitElement {
         .filter((tx) => tx.amount < 0)
         .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
       const goalProgress =
-        bucket.monthlyGoal != null && bucket.monthlyGoal > 0 ? (spentAmount / bucket.monthlyGoal) * 100 : 0;
+        bucket.monthlyGoal != null && bucket.monthlyGoal >= MIN_MONTHLY_GOAL
+          ? (spentAmount / bucket.monthlyGoal) * 100
+          : 0;
       const goalStatus =
-        bucket.monthlyGoal == null || bucket.monthlyGoal <= 0
+        bucket.monthlyGoal == null || bucket.monthlyGoal < MIN_MONTHLY_GOAL
           ? "none"
           : goalProgress >= 100
             ? "exceeded"
@@ -610,7 +612,9 @@ export class SpinderBuckets extends LitElement {
 
   override render(): TemplateResult {
     const bucketsWithData = this.getBucketsWithData();
-    const bucketsWithGoals = bucketsWithData.filter((bucket) => bucket.monthlyGoal != null && bucket.monthlyGoal > 0);
+    const bucketsWithGoals = bucketsWithData.filter(
+      (bucket) => bucket.monthlyGoal != null && bucket.monthlyGoal >= MIN_MONTHLY_GOAL,
+    );
     const approachingGoals = bucketsWithGoals.filter((bucket) => bucket.goalStatus === "approaching").length;
     const exceededGoals = bucketsWithGoals.filter((bucket) => bucket.goalStatus === "exceeded").length;
 
@@ -647,7 +651,7 @@ export class SpinderBuckets extends LitElement {
                 <span class="bucket-amount ${this.getAmountClass(bucket.totalAmount)}">
                   ${formatCurrency(bucket.totalAmount)}
                 </span>
-                ${bucket.monthlyGoal != null && bucket.monthlyGoal > 0
+                ${bucket.monthlyGoal != null && bucket.monthlyGoal >= MIN_MONTHLY_GOAL
                   ? html`
                       <div class="goal-container">
                         <div class="goal-text">
