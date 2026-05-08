@@ -508,9 +508,19 @@ export class SpinderBuckets extends LitElement {
 
     const cleanedFilterTexts = this.modalFilterTexts.map((text) => text.trim()).filter((text) => text.length > 0);
     const parsedMonthlyGoal = this.modalMonthlyGoal.trim() ? Number(this.modalMonthlyGoal) : undefined;
+    const monthlyGoalInput = this.shadowRoot?.querySelector("#bucket-monthly-goal") as HTMLInputElement | null;
 
     if (cleanedFilterTexts.length === 0) return;
-    if (parsedMonthlyGoal != null && (!Number.isFinite(parsedMonthlyGoal) || parsedMonthlyGoal < 0)) return;
+    if (parsedMonthlyGoal != null && (!Number.isFinite(parsedMonthlyGoal) || parsedMonthlyGoal < 0.01)) {
+      if (monthlyGoalInput) {
+        monthlyGoalInput.setCustomValidity("Monthly budget goal must be greater than 0.");
+        monthlyGoalInput.reportValidity();
+      }
+      return;
+    }
+    if (monthlyGoalInput) {
+      monthlyGoalInput.setCustomValidity("");
+    }
 
     if (this.editingBucket) {
       // Update existing bucket
@@ -597,7 +607,7 @@ export class SpinderBuckets extends LitElement {
 
   override render(): TemplateResult {
     const bucketsWithData = this.getBucketsWithData();
-    const bucketsWithGoals = bucketsWithData.filter((bucket) => bucket.monthlyGoal != null);
+    const bucketsWithGoals = bucketsWithData.filter((bucket) => bucket.monthlyGoal != null && bucket.monthlyGoal > 0);
     const approachingGoals = bucketsWithGoals.filter((bucket) => bucket.goalStatus === "approaching").length;
     const exceededGoals = bucketsWithGoals.filter((bucket) => bucket.goalStatus === "exceeded").length;
 
@@ -634,7 +644,7 @@ export class SpinderBuckets extends LitElement {
                 <span class="bucket-amount ${this.getAmountClass(bucket.totalAmount)}">
                   ${formatCurrency(bucket.totalAmount)}
                 </span>
-                ${bucket.monthlyGoal != null
+                ${bucket.monthlyGoal != null && bucket.monthlyGoal > 0
                   ? html`
                       <div class="goal-container">
                         <div class="goal-text">
@@ -643,7 +653,7 @@ export class SpinderBuckets extends LitElement {
                         </div>
                         <div class="goal-progress-track">
                           <div
-                            class="goal-progress-fill ${bucket.goalStatus === "none" ? "on-track" : bucket.goalStatus}"
+                            class="goal-progress-fill ${bucket.goalStatus}"
                             style="width: ${Math.min(bucket.goalProgress, 100)}%"></div>
                         </div>
                         ${bucket.goalStatus === "approaching" || bucket.goalStatus === "exceeded"
@@ -741,7 +751,7 @@ export class SpinderBuckets extends LitElement {
               id="bucket-monthly-goal"
               class="form-input"
               type="number"
-              min="0"
+              min="0.01"
               step="0.01"
               .value=${this.modalMonthlyGoal}
               @input=${(e: Event) => (this.modalMonthlyGoal = (e.target as HTMLInputElement).value)}
