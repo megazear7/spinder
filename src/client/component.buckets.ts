@@ -33,6 +33,13 @@ export class SpinderBuckets extends LitElement {
         margin-top: var(--size-large);
       }
 
+      .goals-summary {
+        margin-top: var(--size-large);
+        text-align: left;
+        font-size: var(--font-small);
+        color: var(--color-primary-text-muted);
+      }
+
       .buckets-container::-webkit-scrollbar {
         height: 6px;
       }
@@ -94,6 +101,7 @@ export class SpinderBuckets extends LitElement {
         align-items: center;
         margin-top: var(--size-medium);
         flex-direction: column;
+        gap: var(--size-small);
       }
 
       .bucket-count {
@@ -112,6 +120,61 @@ export class SpinderBuckets extends LitElement {
       }
 
       .bucket-amount.negative {
+        color: var(--color-error);
+      }
+
+      .goal-container {
+        width: 100%;
+        margin-top: var(--size-small);
+        text-align: left;
+      }
+
+      .goal-text {
+        font-size: var(--font-small);
+        color: var(--color-primary-text-muted);
+        display: flex;
+        justify-content: space-between;
+        gap: var(--size-small);
+      }
+
+      .goal-progress-track {
+        width: 100%;
+        height: 8px;
+        border-radius: var(--border-radius-medium);
+        background: var(--color-overlay-medium);
+        overflow: hidden;
+        margin-top: var(--size-small);
+      }
+
+      .goal-progress-fill {
+        height: 100%;
+        border-radius: var(--border-radius-medium);
+        transition: var(--transition-all);
+      }
+
+      .goal-progress-fill.on-track {
+        background: var(--color-success);
+      }
+
+      .goal-progress-fill.approaching {
+        background: var(--color-warning);
+      }
+
+      .goal-progress-fill.exceeded {
+        background: var(--color-error);
+      }
+
+      .goal-alert {
+        margin-top: var(--size-small);
+        font-size: var(--font-tiny);
+        font-weight: var(--font-weight-semibold);
+      }
+
+      .goal-alert.approaching {
+        color: var(--color-warning);
+      }
+
+      .goal-alert.exceeded {
         color: var(--color-error);
       }
 
@@ -359,6 +422,9 @@ export class SpinderBuckets extends LitElement {
   @state()
   private modalFilterTexts: string[] = [];
 
+  @state()
+  private modalMonthlyGoal = "";
+
   override connectedCallback(): void {
     super.connectedCallback();
     this.loadBuckets();
@@ -390,12 +456,28 @@ export class SpinderBuckets extends LitElement {
       const matchingTransactions = filteredTransactions.filter((tx) =>
         bucket.filterTexts.some((filterText) => tx.description.toLowerCase().includes(filterText.toLowerCase())),
       );
+      const spentAmount = matchingTransactions
+        .filter((tx) => tx.amount < 0)
+        .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
+      const goalProgress = bucket.monthlyGoal && bucket.monthlyGoal > 0 ? (spentAmount / bucket.monthlyGoal) * 100 : 0;
+      const goalStatus =
+        bucket.monthlyGoal == null || bucket.monthlyGoal <= 0
+          ? "none"
+          : goalProgress >= 100
+            ? "exceeded"
+            : goalProgress >= 80
+              ? "approaching"
+              : "on-track";
 
       return {
         name: bucket.name,
         filterTexts: bucket.filterTexts,
+        monthlyGoal: bucket.monthlyGoal,
         transactionCount: matchingTransactions.length,
         totalAmount: matchingTransactions.reduce((sum, tx) => sum + tx.amount, 0),
+        spentAmount,
+        goalProgress,
+        goalStatus,
       };
     });
   }
@@ -409,6 +491,7 @@ export class SpinderBuckets extends LitElement {
     this.editingBucket = null;
     this.modalName = "";
     this.modalFilterTexts = [""];
+    this.modalMonthlyGoal = "";
     this.modal.open();
   }
 
@@ -416,6 +499,7 @@ export class SpinderBuckets extends LitElement {
     this.editingBucket = bucket;
     this.modalName = bucket.name;
     this.modalFilterTexts = [...bucket.filterTexts];
+    this.modalMonthlyGoal = bucket.monthlyGoal != null ? bucket.monthlyGoal.toString() : "";
     this.modal.open();
   }
 
@@ -423,8 +507,10 @@ export class SpinderBuckets extends LitElement {
     if (!this.modalName.trim() || this.modalFilterTexts.every((text) => !text.trim())) return;
 
     const cleanedFilterTexts = this.modalFilterTexts.map((text) => text.trim()).filter((text) => text.length > 0);
+    const parsedMonthlyGoal = this.modalMonthlyGoal.trim() ? Number(this.modalMonthlyGoal) : undefined;
 
     if (cleanedFilterTexts.length === 0) return;
+    if (parsedMonthlyGoal != null && (!Number.isFinite(parsedMonthlyGoal) || parsedMonthlyGoal < 0)) return;
 
     if (this.editingBucket) {
       // Update existing bucket
@@ -433,6 +519,7 @@ export class SpinderBuckets extends LitElement {
         this.buckets[index] = {
           name: this.modalName.trim(),
           filterTexts: cleanedFilterTexts,
+          monthlyGoal: parsedMonthlyGoal,
         };
       }
     } else {
@@ -442,6 +529,7 @@ export class SpinderBuckets extends LitElement {
         {
           name: this.modalName.trim(),
           filterTexts: cleanedFilterTexts,
+          monthlyGoal: parsedMonthlyGoal,
         },
       ];
     }
@@ -494,6 +582,12 @@ export class SpinderBuckets extends LitElement {
     return amount >= 0 ? "positive" : "negative";
   }
 
+  private getGoalAlertMessage(bucket: BucketWithData): string {
+    if (bucket.goalStatus === "approaching") return "Approaching budget limit";
+    if (bucket.goalStatus === "exceeded") return "Budget exceeded";
+    return "";
+  }
+
   private isBucketSelected(bucket: BucketWithData): boolean {
     if (!this.bucketFilterContext) return false;
 
@@ -503,8 +597,18 @@ export class SpinderBuckets extends LitElement {
 
   override render(): TemplateResult {
     const bucketsWithData = this.getBucketsWithData();
+    const bucketsWithGoals = bucketsWithData.filter((bucket) => bucket.monthlyGoal != null);
+    const approachingGoals = bucketsWithGoals.filter((bucket) => bucket.goalStatus === "approaching").length;
+    const exceededGoals = bucketsWithGoals.filter((bucket) => bucket.goalStatus === "exceeded").length;
 
     return html`
+      ${bucketsWithGoals.length > 0
+        ? html`
+            <div class="goals-summary">
+              Goals: ${bucketsWithGoals.length} active • ${approachingGoals} approaching • ${exceededGoals} exceeded
+            </div>
+          `
+        : ""}
       <div class="buckets-container">
         ${bucketsWithData.map(
           (bucket, index) => html`
@@ -530,6 +634,26 @@ export class SpinderBuckets extends LitElement {
                 <span class="bucket-amount ${this.getAmountClass(bucket.totalAmount)}">
                   ${formatCurrency(bucket.totalAmount)}
                 </span>
+                ${bucket.monthlyGoal != null
+                  ? html`
+                      <div class="goal-container">
+                        <div class="goal-text">
+                          <span>Goal</span>
+                          <span>${formatCurrency(bucket.spentAmount)} / ${formatCurrency(bucket.monthlyGoal)}</span>
+                        </div>
+                        <div class="goal-progress-track">
+                          <div
+                            class="goal-progress-fill ${bucket.goalStatus === "none" ? "on-track" : bucket.goalStatus}"
+                            style="width: ${Math.min(bucket.goalProgress, 100)}%"></div>
+                        </div>
+                        ${bucket.goalStatus === "approaching" || bucket.goalStatus === "exceeded"
+                          ? html`
+                              <div class="goal-alert ${bucket.goalStatus}">${this.getGoalAlertMessage(bucket)}</div>
+                            `
+                          : ""}
+                      </div>
+                    `
+                  : ""}
               </div>
               <div class="arrow-buttons">
                 <button
@@ -609,6 +733,19 @@ export class SpinderBuckets extends LitElement {
                 + Add Filter Text
               </button>
             </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="bucket-monthly-goal">Monthly Budget Goal (optional)</label>
+            <input
+              id="bucket-monthly-goal"
+              class="form-input"
+              type="number"
+              min="0"
+              step="0.01"
+              .value=${this.modalMonthlyGoal}
+              @input=${(e: Event) => (this.modalMonthlyGoal = (e.target as HTMLInputElement).value)}
+              placeholder="e.g., 150" />
           </div>
 
           <div class="modal-actions">

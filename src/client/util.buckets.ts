@@ -7,7 +7,12 @@ export const saveBuckets = (buckets: Bucket[]): void => {
 export const loadBuckets = (): Bucket[] => {
   const data = localStorage.getItem("buckets");
   if (data) {
-    return JSON.parse(data);
+    try {
+      const parsed = JSON.parse(data);
+      return Bucket.array().parse(parsed);
+    } catch {
+      return [];
+    }
   }
   return [];
 };
