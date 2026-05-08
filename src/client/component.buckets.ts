@@ -18,6 +18,8 @@ import "./component.modal.js";
 import { formatCurrency } from "../shared/util.math.js";
 import { SpinderModal } from "./component.modal.js";
 
+const MIN_MONTHLY_GOAL = 0.01;
+
 @customElement("spinder-buckets")
 export class SpinderBuckets extends LitElement {
   static override styles = [
@@ -459,7 +461,8 @@ export class SpinderBuckets extends LitElement {
       const spentAmount = matchingTransactions
         .filter((tx) => tx.amount < 0)
         .reduce((sum, tx) => sum + Math.abs(tx.amount), 0);
-      const goalProgress = bucket.monthlyGoal && bucket.monthlyGoal > 0 ? (spentAmount / bucket.monthlyGoal) * 100 : 0;
+      const goalProgress =
+        bucket.monthlyGoal != null && bucket.monthlyGoal > 0 ? (spentAmount / bucket.monthlyGoal) * 100 : 0;
       const goalStatus =
         bucket.monthlyGoal == null || bucket.monthlyGoal <= 0
           ? "none"
@@ -511,7 +514,7 @@ export class SpinderBuckets extends LitElement {
     const monthlyGoalInput = this.shadowRoot?.querySelector("#bucket-monthly-goal") as HTMLInputElement | null;
 
     if (cleanedFilterTexts.length === 0) return;
-    if (parsedMonthlyGoal != null && (!Number.isFinite(parsedMonthlyGoal) || parsedMonthlyGoal < 0.01)) {
+    if (parsedMonthlyGoal != null && (!Number.isFinite(parsedMonthlyGoal) || parsedMonthlyGoal < MIN_MONTHLY_GOAL)) {
       if (monthlyGoalInput) {
         monthlyGoalInput.setCustomValidity("Monthly budget goal must be greater than 0.");
         monthlyGoalInput.reportValidity();
@@ -751,7 +754,7 @@ export class SpinderBuckets extends LitElement {
               id="bucket-monthly-goal"
               class="form-input"
               type="number"
-              min="0.01"
+              min=${MIN_MONTHLY_GOAL.toString()}
               step="0.01"
               .value=${this.modalMonthlyGoal}
               @input=${(e: Event) => (this.modalMonthlyGoal = (e.target as HTMLInputElement).value)}
