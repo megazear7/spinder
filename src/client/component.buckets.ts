@@ -518,7 +518,7 @@ export class SpinderBuckets extends LitElement {
     if (cleanedFilterTexts.length === 0) return;
     if (parsedMonthlyGoal != null && (!Number.isFinite(parsedMonthlyGoal) || parsedMonthlyGoal < MIN_MONTHLY_GOAL)) {
       if (monthlyGoalInput) {
-        monthlyGoalInput.setCustomValidity("Monthly budget goal must be greater than 0.");
+        monthlyGoalInput.setCustomValidity(`Monthly budget goal must be at least ${MIN_MONTHLY_GOAL}.`);
         monthlyGoalInput.reportValidity();
       }
       return;
