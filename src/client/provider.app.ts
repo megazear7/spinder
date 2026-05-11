@@ -79,6 +79,7 @@ export abstract class SpinderAppProvider extends SpinderAbstractProvider {
     this.bucketFilterContext = {
       name: updateEvent.name,
       filterTexts: updateEvent.filterTexts,
+      isUncategorized: updateEvent.isUncategorized,
     };
   };
 

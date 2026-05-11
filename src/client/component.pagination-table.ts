@@ -20,6 +20,7 @@ import { formatCurrency } from "../shared/util.math.js";
 import { getLabelsForTransaction, saveLabels, loadLabels, toTitleCase } from "./util.labels.js";
 import { UpdateLabelFilterEvent } from "./event.update-label-filter.js";
 import { Label } from "../shared/type.label.js";
+import { loadBuckets } from "./util.buckets.js";
 import "./component.sample-csv.js";
 import "./component.label-transaction-management.js";
 
@@ -167,6 +168,7 @@ export class SpinderPaginationTable extends LitElement {
         gap: var(--size-medium);
         margin-top: var(--size-xl);
         padding: var(--size-large);
+        flex-wrap: wrap;
       }
 
       .pagination button {
@@ -198,6 +200,80 @@ export class SpinderPaginationTable extends LitElement {
         color: var(--color-primary-text-muted);
         font-size: var(--font-small);
         font-weight: var(--font-weight-normal);
+      }
+
+      .rows-per-page {
+        display: flex;
+        align-items: center;
+        gap: var(--size-small);
+        font-size: var(--font-small);
+        color: var(--color-primary-text-muted);
+      }
+
+      .rows-per-page select {
+        padding: var(--size-small) var(--size-medium);
+        border: 2px solid var(--color-overlay-strong);
+        border-radius: var(--border-radius-medium);
+        background: var(--color-primary-surface);
+        color: var(--color-primary-text);
+        font-size: var(--font-small);
+        cursor: pointer;
+        transition: var(--transition-all);
+      }
+
+      .rows-per-page select:focus {
+        outline: none;
+        border-color: var(--color-accent);
+      }
+
+      .page-jump {
+        display: flex;
+        align-items: center;
+        gap: var(--size-small);
+        font-size: var(--font-small);
+        color: var(--color-primary-text-muted);
+      }
+
+      .page-jump-input {
+        width: 60px;
+        padding: var(--size-small) var(--size-medium);
+        border: 2px solid var(--color-overlay-strong);
+        border-radius: var(--border-radius-medium);
+        background: var(--color-primary-surface);
+        color: var(--color-primary-text);
+        font-size: var(--font-small);
+        text-align: center;
+        transition: var(--transition-all);
+      }
+
+      .page-jump-input:focus {
+        outline: none;
+        border-color: var(--color-accent);
+      }
+
+      .page-jump-btn {
+        padding: var(--size-small) var(--size-medium);
+        border: 2px solid var(--color-accent);
+        background: transparent;
+        color: var(--color-accent);
+        border-radius: var(--border-radius-medium);
+        font-size: var(--font-small);
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        transition: var(--transition-all);
+      }
+
+      .page-jump-btn:hover {
+        background: var(--color-accent);
+        color: var(--color-white);
+      }
+
+      .amount-zero {
+        color: var(--color-primary-text-muted);
+        opacity: var(--opacity-muted);
+        font-weight: var(--font-weight-normal);
+        font-size: var(--font-medium);
+        font-family: var(--font-family-monospace);
       }
 
       .amount {
@@ -312,7 +388,15 @@ export class SpinderPaginationTable extends LitElement {
   @state()
   private currentPage = 1;
 
-  private itemsPerPage = 20;
+  @state()
+  private itemsPerPage = (() => {
+    const stored = localStorage.getItem("spinder_rows_per_page");
+    const parsed = parseInt(stored ?? "");
+    return [10, 20, 50, 100].includes(parsed) ? parsed : 20;
+  })();
+
+  @state()
+  private pageJumpValue = "";
 
   private get filteredTransactions(): Transaction[] {
     if (!this.transactionContext?.transactions) return [];
@@ -320,7 +404,16 @@ export class SpinderPaginationTable extends LitElement {
     let transactions = this.transactionContext.transactions;
 
     // Apply bucket filter first (if it exists)
-    if (this.bucketFilterContext?.filterTexts && this.bucketFilterContext.filterTexts.length > 0) {
+    if (this.bucketFilterContext?.isUncategorized) {
+      // Show only transactions that don't match any bucket
+      const allBuckets = loadBuckets();
+      transactions = transactions.filter(
+        (tx) =>
+          !allBuckets.some((bucket) =>
+            bucket.filterTexts.some((filterText) => tx.description.toLowerCase().includes(filterText.toLowerCase())),
+          ),
+      );
+    } else if (this.bucketFilterContext?.filterTexts && this.bucketFilterContext.filterTexts.length > 0) {
       transactions = transactions.filter((tx) =>
         this.bucketFilterContext!.filterTexts.some((filterText) =>
           tx.description.toLowerCase().includes(filterText.toLowerCase()),
@@ -353,10 +446,17 @@ export class SpinderPaginationTable extends LitElement {
     return transactions;
   }
 
+  private get sortedFilteredTransactions(): Transaction[] {
+    const transactions = this.filteredTransactions;
+    const nonZero = transactions.filter((t) => t.amount !== 0 && !isNaN(t.amount));
+    const zero = transactions.filter((t) => t.amount === 0 || isNaN(t.amount));
+    return [...nonZero, ...zero];
+  }
+
   private get paginatedTransactions(): Transaction[] {
     const start = (this.currentPage - 1) * this.itemsPerPage;
     const end = start + this.itemsPerPage;
-    return this.filteredTransactions.slice(start, end);
+    return this.sortedFilteredTransactions.slice(start, end);
   }
 
   private get totalPages(): number {
@@ -457,13 +557,58 @@ export class SpinderPaginationTable extends LitElement {
     this.currentPage = 1; // Reset to first page on search
   }
 
+  private handleRowsPerPageChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const newValue = parseInt(select.value);
+    this.itemsPerPage = newValue;
+    localStorage.setItem("spinder_rows_per_page", String(newValue));
+    this.currentPage = 1;
+  }
+
+  private handlePageJumpInput(event: Event): void {
+    this.pageJumpValue = (event.target as HTMLInputElement).value;
+  }
+
+  private handlePageJump(): void {
+    const page = parseInt(this.pageJumpValue);
+    if (!isNaN(page) && page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+    }
+    this.pageJumpValue = "";
+  }
+
+  private handlePageJumpKeydown(event: KeyboardEvent): void {
+    if (event.key === "Enter") {
+      this.handlePageJump();
+    }
+  }
+
+  override updated(changedProperties: Map<string, unknown>): void {
+    super.updated(changedProperties);
+    if (
+      changedProperties.has("bucketFilterContext") ||
+      changedProperties.has("timeFilterContext") ||
+      changedProperties.has("labelFilterContext")
+    ) {
+      this.currentPage = 1;
+    }
+  }
+
   private getSearchPlaceholder(): string {
-    if (this.bucketFilterContext?.name && this.labelFilterContext?.labelName) {
-      return `Search within "${this.bucketFilterContext.name}" bucket and "${this.labelFilterContext.labelName}" label...`;
-    } else if (this.bucketFilterContext?.name) {
-      return `Search within "${this.bucketFilterContext.name}" bucket...`;
-    } else if (this.labelFilterContext?.labelName) {
-      return `Search within "${this.labelFilterContext.labelName}" label...`;
+    const isUncategorized = this.bucketFilterContext?.isUncategorized;
+    const bucketName = this.bucketFilterContext?.name;
+    const labelName = this.labelFilterContext?.labelName;
+
+    if (isUncategorized && labelName) {
+      return `Search within uncategorized transactions and "${labelName}" label...`;
+    } else if (isUncategorized) {
+      return `Search within uncategorized transactions...`;
+    } else if (bucketName && labelName) {
+      return `Search within "${bucketName}" bucket and "${labelName}" label...`;
+    } else if (bucketName) {
+      return `Search within "${bucketName}" bucket...`;
+    } else if (labelName) {
+      return `Search within "${labelName}" label...`;
     }
     return "Search transactions...";
   }
@@ -505,13 +650,21 @@ export class SpinderPaginationTable extends LitElement {
             placeholder=${this.getSearchPlaceholder()}
             .value=${this.searchQuery}
             @input=${this.handleSearchChange} />
-          ${this.bucketFilterContext?.name
+          ${this.bucketFilterContext?.name && !this.bucketFilterContext?.isUncategorized
             ? html`
                 <div class="filter-indicator">
                   <span>Filtering: "${this.bucketFilterContext.name}" bucket</span>
                   <button class="clear-filter-btn" @click=${this.clearBucketFilter} title="Clear bucket filter">
                     ✕
                   </button>
+                </div>
+              `
+            : ""}
+          ${this.bucketFilterContext?.isUncategorized
+            ? html`
+                <div class="filter-indicator">
+                  <span>Filtering: Uncategorized transactions</span>
+                  <button class="clear-filter-btn" @click=${this.clearBucketFilter} title="Clear filter">✕</button>
                 </div>
               `
             : ""}
@@ -544,8 +697,15 @@ export class SpinderPaginationTable extends LitElement {
                   <tr>
                     <td>${transaction.postingDate}</td>
                     <td>${transaction.description}</td>
-                    <td class="amount ${this.getAmountClass(transaction.amount)}">
-                      ${formatCurrency(transaction.amount)}
+                    <td
+                      class="amount ${transaction.amount !== 0 && !isNaN(transaction.amount)
+                        ? this.getAmountClass(transaction.amount)
+                        : ""}">
+                      ${transaction.amount === 0 || isNaN(transaction.amount)
+                        ? html`
+                            <span class="amount-zero">$0.00</span>
+                          `
+                        : formatCurrency(transaction.amount)}
                     </td>
                     <td>${formatCurrency(parseFloat(transaction.balance || "0"))}</td>
                     <td>${this.renderLabelsCell(transaction)}</td>
@@ -559,6 +719,16 @@ export class SpinderPaginationTable extends LitElement {
         ${this.totalPages > 1
           ? html`
               <div class="pagination">
+                <div class="rows-per-page">
+                  <span>Rows:</span>
+                  <select @change=${this.handleRowsPerPageChange}>
+                    ${[10, 20, 50, 100].map(
+                      (n) => html`
+                        <option value=${n} ?selected=${this.itemsPerPage === n}>${n}</option>
+                      `,
+                    )}
+                  </select>
+                </div>
                 <button @click=${() => this.handlePageChange(this.currentPage - 1)} ?disabled=${this.currentPage === 1}>
                   ← Previous
                 </button>
@@ -568,9 +738,35 @@ export class SpinderPaginationTable extends LitElement {
                   ?disabled=${this.currentPage === this.totalPages}>
                   Next →
                 </button>
+                <div class="page-jump">
+                  <span>Go to:</span>
+                  <input
+                    type="number"
+                    class="page-jump-input"
+                    .value=${this.pageJumpValue}
+                    @input=${this.handlePageJumpInput}
+                    @keydown=${this.handlePageJumpKeydown}
+                    min="1"
+                    max=${this.totalPages}
+                    placeholder="#" />
+                  <button class="page-jump-btn" @click=${this.handlePageJump}>Go</button>
+                </div>
               </div>
             `
-          : ""}
+          : html`
+              <div class="pagination">
+                <div class="rows-per-page">
+                  <span>Rows:</span>
+                  <select @change=${this.handleRowsPerPageChange}>
+                    ${[10, 20, 50, 100].map(
+                      (n) => html`
+                        <option value=${n} ?selected=${this.itemsPerPage === n}>${n}</option>
+                      `,
+                    )}
+                  </select>
+                </div>
+              </div>
+            `}
       </div>
 
       ${this.showLabelModal && this.modalTransaction

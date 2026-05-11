@@ -252,6 +252,53 @@ export class SpinderBuckets extends LitElement {
         color: var(--color-primary-text-muted);
       }
 
+      .bucket.uncategorized {
+        border-style: dashed;
+        border-color: var(--color-primary-text-muted);
+      }
+
+      .bucket.uncategorized:hover {
+        background: rgba(153, 153, 153, 0.05);
+      }
+
+      .bucket.uncategorized.selected {
+        background: rgba(153, 153, 153, 0.1);
+        border-color: var(--color-primary-text-muted);
+      }
+
+      .uncategorized-name {
+        font-size: var(--font-medium);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-primary-text-muted);
+        margin-bottom: var(--size-small);
+      }
+
+      .uncategorized-amount {
+        font-size: var(--font-medium);
+        font-weight: var(--font-weight-bold);
+        font-family: var(--font-family-monospace);
+        color: var(--color-primary-text-muted);
+      }
+
+      .bulk-categorize-btn {
+        margin-top: var(--size-medium);
+        width: 100%;
+        padding: var(--size-small) var(--size-medium);
+        border: 1px solid var(--color-primary-text-muted);
+        border-radius: var(--border-radius-medium);
+        background: transparent;
+        color: var(--color-primary-text-muted);
+        font-size: var(--font-tiny);
+        cursor: pointer;
+        transition: var(--transition-all);
+      }
+
+      .bulk-categorize-btn:hover {
+        background: var(--color-overlay-light);
+        color: var(--color-primary-text);
+        border-color: var(--color-primary-text);
+      }
+
       .add-icon {
         width: 24px;
         height: 24px;
@@ -487,6 +534,45 @@ export class SpinderBuckets extends LitElement {
     });
   }
 
+  private getUncategorizedData(): { count: number; totalAmount: number } {
+    if (!this.transactionContext?.transactions) return { count: 0, totalAmount: 0 };
+
+    let filteredTransactions = this.transactionContext.transactions;
+    if (this.timeFilterContext?.startDate && this.timeFilterContext?.endDate) {
+      const startDate = this.timeFilterContext.startDate;
+      const endDate = this.timeFilterContext.endDate;
+      filteredTransactions = filteredTransactions.filter((tx) => {
+        const txDate = new Date(tx.postingDate);
+        return txDate >= startDate && txDate <= endDate;
+      });
+    }
+
+    const uncategorized = filteredTransactions.filter(
+      (tx) =>
+        !this.buckets.some((bucket) =>
+          bucket.filterTexts.some((filterText) => tx.description.toLowerCase().includes(filterText.toLowerCase())),
+        ),
+    );
+
+    return {
+      count: uncategorized.length,
+      totalAmount: uncategorized.reduce((sum, tx) => sum + tx.amount, 0),
+    };
+  }
+
+  private handleUncategorizedClick(): void {
+    this.dispatchEvent(new UpdateBucketFilterEvent([], "Uncategorized", true));
+  }
+
+  private handleBulkCategorize(e: Event): void {
+    e.stopPropagation();
+    this.handleAddBucket();
+  }
+
+  private isUncategorizedSelected(): boolean {
+    return this.bucketFilterContext?.isUncategorized === true;
+  }
+
   private handleBucketClick(bucket: BucketWithData): void {
     // For bucket clicks, we'll use all filter texts for comprehensive filtering
     this.dispatchEvent(new UpdateBucketFilterEvent(bucket.filterTexts, bucket.name));
@@ -627,6 +713,16 @@ export class SpinderBuckets extends LitElement {
           `
         : ""}
       <div class="buckets-container">
+        <div
+          class="bucket uncategorized ${this.isUncategorizedSelected() ? "selected" : ""}"
+          @click=${this.handleUncategorizedClick}>
+          <div class="uncategorized-name">Uncategorized</div>
+          <div class="bucket-stats">
+            <span class="bucket-count">${this.getUncategorizedData().count} transactions</span>
+            <span class="uncategorized-amount">${formatCurrency(this.getUncategorizedData().totalAmount)}</span>
+          </div>
+          <button class="bulk-categorize-btn" @click=${this.handleBulkCategorize}>⊕ Bulk Categorize</button>
+        </div>
         ${bucketsWithData.map(
           (bucket, index) => html`
             <div
