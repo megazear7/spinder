@@ -88,7 +88,7 @@ export class SpinderLabelTransactionManagement extends LitElement {
       }
 
       .add-existing-btn {
-        width: 200px;
+        width: auto;
         padding: var(--size-medium) var(--size-large);
         background: var(--color-accent);
         color: var(--color-white);
@@ -124,7 +124,7 @@ export class SpinderLabelTransactionManagement extends LitElement {
       }
 
       .create-add-btn {
-        width: 200px;
+        width: auto;
         padding: var(--size-medium) var(--size-large);
         background: var(--color-success);
         color: var(--color-white);
@@ -181,6 +181,27 @@ export class SpinderLabelTransactionManagement extends LitElement {
 
       .btn-primary:hover {
         background: var(--color-accent-dark);
+      }
+
+      @media (max-width: 768px) {
+        .control-row {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        .add-existing-btn,
+        .create-add-btn {
+          width: 100%;
+        }
+
+        .modal-actions {
+          flex-direction: column-reverse;
+        }
+
+        .btn-secondary,
+        .btn-primary {
+          width: 100%;
+        }
       }
     `,
   ];

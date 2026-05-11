@@ -18,9 +18,9 @@ export class SpinderToast extends LitElement {
         right: var(--size-large);
         z-index: 10000;
         display: none;
-        max-width: 30vw;
+        max-width: min(420px, calc(100vw - (var(--size-large) * 2)));
         padding: var(--size-medium);
-        border-radius: var(--radius-medium);
+        border-radius: var(--border-radius-medium);
         box-shadow: var(--shadow-active);
         color: var(--color-primary-text);
         font-size: var(--font-medium);
@@ -67,6 +67,15 @@ export class SpinderToast extends LitElement {
 
       .close-button:hover {
         opacity: 1;
+      }
+
+      @media (max-width: 768px) {
+        :host {
+          top: var(--size-medium);
+          left: var(--size-medium);
+          right: var(--size-medium);
+          max-width: none;
+        }
       }
     `,
   ];

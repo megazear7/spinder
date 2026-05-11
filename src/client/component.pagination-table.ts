@@ -37,6 +37,7 @@ export class SpinderPaginationTable extends LitElement {
         display: flex;
         gap: var(--size-large);
         align-items: center;
+        flex-wrap: wrap;
         margin-bottom: var(--size-xl);
         padding: var(--size-large);
         background: var(--color-overlay-light);
@@ -116,6 +117,7 @@ export class SpinderPaginationTable extends LitElement {
 
       .table-container {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
         border-radius: var(--border-radius-medium);
         box-shadow: var(--shadow-normal);
         border: 1px solid var(--color-overlay-strong);
@@ -346,6 +348,7 @@ export class SpinderPaginationTable extends LitElement {
 
         .summary {
           text-align: center;
+          width: 100%;
         }
 
         th,
