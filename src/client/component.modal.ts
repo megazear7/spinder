@@ -34,10 +34,10 @@ export class SpinderModal extends LitElement {
         background: var(--color-primary-surface);
         border-radius: var(--border-radius-large);
         box-shadow: var(--shadow-normal);
-        width: 40vw;
-        max-height: 80vh;
+        width: min(700px, calc(100vw - (var(--size-large) * 2)));
+        max-height: calc(100vh - var(--size-4x));
         overflow-y: scroll;
-        margin: 100px auto;
+        margin: var(--size-large) auto;
         position: relative;
         opacity: 0;
         transform: translateY(-20vh);
@@ -113,6 +113,14 @@ export class SpinderModal extends LitElement {
         }
         to {
           background: rgba(0, 0, 0, 0.5);
+        }
+      }
+
+      @media (max-width: 768px) {
+        .modal-content {
+          width: calc(100vw - (var(--size-medium) * 2));
+          border-radius: var(--border-radius-medium);
+          max-height: calc(100vh - (var(--size-medium) * 2));
         }
       }
     `,

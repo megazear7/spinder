@@ -20,6 +20,7 @@ export class SpinderFilters extends LitElement {
         display: flex;
         align-items: center;
         gap: var(--size-medium);
+        flex-wrap: wrap;
         position: relative;
         padding: var(--size-large);
         background: var(--color-overlay-light);
@@ -110,6 +111,29 @@ export class SpinderFilters extends LitElement {
       .selected-label {
         font-weight: var(--font-weight-medium);
         color: var(--color-accent);
+      }
+
+      @media (max-width: 768px) {
+        .time-filter-container {
+          flex-direction: column;
+          align-items: stretch;
+          gap: var(--size-small);
+          padding: var(--size-medium);
+        }
+
+        .time-icon {
+          display: none;
+        }
+
+        .time-select,
+        .label-select {
+          min-width: 0;
+          width: 100%;
+        }
+
+        .clear-button {
+          align-self: flex-end;
+        }
       }
     `,
   ];

@@ -36,7 +36,7 @@ export class SpinderApp extends LitElement {
         border-top: 3px solid transparent;
         border-image: linear-gradient(to right, var(--color-1) 10%, var(--color-2) 90%) 2;
         position: fixed;
-        width: 100vw;
+        width: 100%;
         top: 0;
         left: 0;
         z-index: 999;

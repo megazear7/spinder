@@ -123,6 +123,20 @@ export class SpinderCsvUpload extends LitElement {
         background: var(--color-overlay-light);
         color: var(--color-primary-text-muted);
       }
+
+      @media (max-width: 768px) {
+        .upload-container {
+          padding: var(--size-large);
+        }
+
+        .upload-text {
+          font-size: var(--font-medium);
+        }
+
+        .upload-subtext {
+          font-size: var(--font-small);
+        }
+      }
     `,
   ];
 

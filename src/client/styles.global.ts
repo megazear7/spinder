@@ -34,6 +34,8 @@ export const globalStyles = css`
     margin: var(--size-large) auto;
     min-height: calc(100vh - 100px);
     box-sizing: border-box;
+    width: 100%;
+    padding: 0 var(--size-large);
   }
 
   button {
@@ -45,5 +47,13 @@ export const globalStyles = css`
   svg {
     width: var(--icon-size);
     height: var(--icon-size);
+  }
+
+  @media (max-width: 768px) {
+    main {
+      margin: var(--size-medium) auto;
+      min-height: calc(100vh - 80px);
+      padding: 0 var(--size-medium);
+    }
   }
 `;
