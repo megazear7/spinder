@@ -14,6 +14,7 @@ export const transactionContext = createContext<TransactionContext>("transaction
 export const BucketFilterContext = z.object({
   name: z.string(),
   filterTexts: z.array(z.string()),
+  isUncategorized: z.boolean().optional(),
 });
 export type BucketFilterContext = z.infer<typeof BucketFilterContext>;
 export const bucketFilterContext = createContext<BucketFilterContext>("bucket-filter");
