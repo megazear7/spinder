@@ -698,6 +698,7 @@ export class SpinderBuckets extends LitElement {
 
   override render(): TemplateResult {
     const bucketsWithData = this.getBucketsWithData();
+    const uncategorizedData = this.getUncategorizedData();
     const bucketsWithGoals = bucketsWithData.filter(
       (bucket) => bucket.monthlyGoal != null && bucket.monthlyGoal >= MIN_MONTHLY_GOAL,
     );
@@ -718,8 +719,8 @@ export class SpinderBuckets extends LitElement {
           @click=${this.handleUncategorizedClick}>
           <div class="uncategorized-name">Uncategorized</div>
           <div class="bucket-stats">
-            <span class="bucket-count">${this.getUncategorizedData().count} transactions</span>
-            <span class="uncategorized-amount">${formatCurrency(this.getUncategorizedData().totalAmount)}</span>
+            <span class="bucket-count">${uncategorizedData.count} transactions</span>
+            <span class="uncategorized-amount">${formatCurrency(uncategorizedData.totalAmount)}</span>
           </div>
           <button class="bulk-categorize-btn" @click=${this.handleBulkCategorize}>⊕ Bulk Categorize</button>
         </div>

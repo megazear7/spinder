@@ -447,9 +447,15 @@ export class SpinderPaginationTable extends LitElement {
   }
 
   private get sortedFilteredTransactions(): Transaction[] {
-    const transactions = this.filteredTransactions;
-    const nonZero = transactions.filter((t) => t.amount !== 0 && !isNaN(t.amount));
-    const zero = transactions.filter((t) => t.amount === 0 || isNaN(t.amount));
+    const nonZero: Transaction[] = [];
+    const zero: Transaction[] = [];
+    for (const t of this.filteredTransactions) {
+      if (t.amount === 0 || isNaN(t.amount)) {
+        zero.push(t);
+      } else {
+        nonZero.push(t);
+      }
+    }
     return [...nonZero, ...zero];
   }
 
@@ -591,6 +597,7 @@ export class SpinderPaginationTable extends LitElement {
       changedProperties.has("labelFilterContext")
     ) {
       this.currentPage = 1;
+      this.pageJumpValue = "";
     }
   }
 
