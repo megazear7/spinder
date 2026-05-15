@@ -67,6 +67,7 @@ const CHART_TOOLTIP_BORDER = "rgba(57, 167, 232, 0.4)";
 const CHART_TOOLTIP_TEXT = "#e0e6ed";
 const CHART_BAR_BG = `${CHART_ACCENT_COLOR}80`;
 const CHART_BAR_BORDER = CHART_ACCENT_COLOR;
+const CHART_BUCKET_OPACITY = "99";
 
 const sharedTooltipStyle = {
   backgroundColor: CHART_TOOLTIP_BG,
@@ -483,7 +484,7 @@ export class SpinderTimeSeriesChart extends LitElement {
         {
           label: "Spending by Bucket",
           data: breakdown.map((b) => b.amount),
-          backgroundColor: breakdown.map((_, i) => CHART_COLORS[i % CHART_COLORS.length] + "99"),
+          backgroundColor: breakdown.map((_, i) => CHART_COLORS[i % CHART_COLORS.length] + CHART_BUCKET_OPACITY),
           borderColor: breakdown.map((_, i) => CHART_COLORS[i % CHART_COLORS.length]),
           borderWidth: 2,
           borderRadius: 6,
@@ -561,7 +562,7 @@ export class SpinderTimeSeriesChart extends LitElement {
   override render(): TemplateResult {
     const transactions = this.getFilteredTransactions();
     const hasData = transactions.length > 0;
-    const activeBucket =
+    const hasBucketFilter =
       (this.bucketFilterContext?.name && this.bucketFilterContext.filterTexts.length > 0) ||
       this.bucketFilterContext?.isUncategorized === true;
 
@@ -599,7 +600,7 @@ export class SpinderTimeSeriesChart extends LitElement {
               : ""}
           </div>
         </div>
-        ${activeBucket
+        ${hasBucketFilter
           ? html`
               <div style="margin-bottom: var(--size-medium);">
                 <span class="active-filter-badge">
