@@ -547,8 +547,8 @@ export class SpinderTimeSeriesChart extends LitElement {
   }
 
   private handleClearBucketFilter(): void {
-    // Empty name and filterTexts signals "no bucket selected" (same pattern as pagination-table)
-    this.dispatchEvent(new UpdateBucketFilterEvent([], ""));
+    // Empty name and filterTexts with isUncategorized=false signals "no bucket selected"
+    this.dispatchEvent(new UpdateBucketFilterEvent([], "", false));
   }
 
   private getChartTitle(): string {
@@ -561,7 +561,9 @@ export class SpinderTimeSeriesChart extends LitElement {
   override render(): TemplateResult {
     const transactions = this.getFilteredTransactions();
     const hasData = transactions.length > 0;
-    const activeBucket = this.bucketFilterContext?.name && this.bucketFilterContext.filterTexts.length > 0;
+    const activeBucket =
+      (this.bucketFilterContext?.name && this.bucketFilterContext.filterTexts.length > 0) ||
+      this.bucketFilterContext?.isUncategorized === true;
 
     return html`
       <div class="chart-container">
@@ -601,7 +603,9 @@ export class SpinderTimeSeriesChart extends LitElement {
           ? html`
               <div style="margin-bottom: var(--size-medium);">
                 <span class="active-filter-badge">
-                  ${this.bucketFilterContext!.name}
+                  ${this.bucketFilterContext?.isUncategorized
+                    ? "Uncategorized"
+                    : (this.bucketFilterContext?.name ?? "")}
                   <button class="clear-filter-btn" @click=${this.handleClearBucketFilter} title="Clear bucket filter">
                     ✕
                   </button>
