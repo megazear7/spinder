@@ -13,4 +13,8 @@ export const routes = [
     name: RouteName.enum.security,
     path: "/security",
   },
+  {
+    name: RouteName.enum.insights,
+    path: "/insights",
+  },
 ];

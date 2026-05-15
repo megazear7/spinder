@@ -286,7 +286,17 @@ export class SpinderTimeSeriesChart extends LitElement {
 
   override updated(changedProps: PropertyValues): void {
     super.updated(changedProps);
-    this.renderChart();
+    if (
+      changedProps.has("transactionContext") ||
+      changedProps.has("timeFilterContext") ||
+      changedProps.has("bucketFilterContext") ||
+      changedProps.has("granularity") ||
+      changedProps.has("chartMode")
+    ) {
+      // Defer to next animation frame so the canvas element has been laid out
+      // and Chart.js can read its pixel dimensions correctly.
+      requestAnimationFrame(() => this.renderChart());
+    }
   }
 
   private getFilteredTransactions(): Transaction[] {
