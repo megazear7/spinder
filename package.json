@@ -33,6 +33,7 @@
   "homepage": "https://github.com/megazear7/spinder#readme",
   "dependencies": {
     "@lit/context": "^1.1.6",
+    "chart.js": "^4.4.9",
     "commander": "^14.0.2",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
