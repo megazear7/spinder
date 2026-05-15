@@ -55,6 +55,28 @@ const CHART_COLORS = [
   "#f59e0b",
 ];
 
+// Chart.js renders to canvas and cannot access CSS variables directly.
+// These constants mirror the design tokens defined in app.css.
+const CHART_ACCENT_COLOR = "#39a7e8";
+const CHART_TICK_COLOR = "#999";
+const CHART_TICK_FONT_SIZE = 11;
+const CHART_LABEL_FONT_SIZE = 12;
+const CHART_GRID_COLOR = "rgba(255,255,255,0.05)";
+const CHART_TOOLTIP_BG = "rgba(44, 47, 51, 0.95)";
+const CHART_TOOLTIP_BORDER = "rgba(57, 167, 232, 0.4)";
+const CHART_TOOLTIP_TEXT = "#e0e6ed";
+const CHART_BAR_BG = `${CHART_ACCENT_COLOR}80`;
+const CHART_BAR_BORDER = CHART_ACCENT_COLOR;
+
+const sharedTooltipStyle = {
+  backgroundColor: CHART_TOOLTIP_BG,
+  borderColor: CHART_TOOLTIP_BORDER,
+  borderWidth: 1,
+  titleColor: CHART_TOOLTIP_TEXT,
+  bodyColor: CHART_TOOLTIP_TEXT,
+  padding: 10,
+};
+
 @customElement("spinder-time-series-chart")
 export class SpinderTimeSeriesChart extends LitElement {
   static override styles = [
@@ -400,8 +422,8 @@ export class SpinderTimeSeriesChart extends LitElement {
         {
           label: "Spending",
           data: timeBuckets.map((b) => b.amount),
-          backgroundColor: "rgba(57, 167, 232, 0.5)",
-          borderColor: "rgba(57, 167, 232, 1)",
+          backgroundColor: CHART_BAR_BG,
+          borderColor: CHART_BAR_BORDER,
           borderWidth: 2,
           borderRadius: 6,
           borderSkipped: false,
@@ -427,24 +449,19 @@ export class SpinderTimeSeriesChart extends LitElement {
           callbacks: {
             label: (ctx) => ` ${formatCurrency(ctx.parsed.y as number)}`,
           },
-          backgroundColor: "rgba(44, 47, 51, 0.95)",
-          borderColor: "rgba(57, 167, 232, 0.4)",
-          borderWidth: 1,
-          titleColor: "#e0e6ed",
-          bodyColor: "#e0e6ed",
-          padding: 10,
+          ...sharedTooltipStyle,
         },
       },
       scales: {
         x: {
-          grid: { color: "rgba(255,255,255,0.05)" },
-          ticks: { color: "#999", font: { size: 11 }, maxRotation: 45 },
+          grid: { color: CHART_GRID_COLOR },
+          ticks: { color: CHART_TICK_COLOR, font: { size: CHART_TICK_FONT_SIZE }, maxRotation: 45 },
         },
         y: {
-          grid: { color: "rgba(255,255,255,0.05)" },
+          grid: { color: CHART_GRID_COLOR },
           ticks: {
-            color: "#999",
-            font: { size: 11 },
+            color: CHART_TICK_COLOR,
+            font: { size: CHART_TICK_FONT_SIZE },
             callback: (value) => `$${(value as number).toLocaleString()}`,
           },
           beginAtZero: true,
@@ -498,27 +515,22 @@ export class SpinderTimeSeriesChart extends LitElement {
           callbacks: {
             label: (ctx) => ` ${formatCurrency(ctx.parsed.x as number)}`,
           },
-          backgroundColor: "rgba(44, 47, 51, 0.95)",
-          borderColor: "rgba(57, 167, 232, 0.4)",
-          borderWidth: 1,
-          titleColor: "#e0e6ed",
-          bodyColor: "#e0e6ed",
-          padding: 10,
+          ...sharedTooltipStyle,
         },
       },
       scales: {
         x: {
-          grid: { color: "rgba(255,255,255,0.05)" },
+          grid: { color: CHART_GRID_COLOR },
           ticks: {
-            color: "#999",
-            font: { size: 11 },
+            color: CHART_TICK_COLOR,
+            font: { size: CHART_TICK_FONT_SIZE },
             callback: (value) => `$${(value as number).toLocaleString()}`,
           },
           beginAtZero: true,
         },
         y: {
-          grid: { color: "rgba(255,255,255,0.05)" },
-          ticks: { color: "#999", font: { size: 12 } },
+          grid: { color: CHART_GRID_COLOR },
+          ticks: { color: CHART_TICK_COLOR, font: { size: CHART_LABEL_FONT_SIZE } },
         },
       },
     };
@@ -535,6 +547,7 @@ export class SpinderTimeSeriesChart extends LitElement {
   }
 
   private handleClearBucketFilter(): void {
+    // Empty name and filterTexts signals "no bucket selected" (same pattern as pagination-table)
     this.dispatchEvent(new UpdateBucketFilterEvent([], ""));
   }
 
