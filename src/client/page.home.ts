@@ -7,6 +7,7 @@ import "./component.pagination-table.js";
 import "./component.buckets.js";
 import "./component.filters.js";
 import "./component.footer.js";
+import "./component.time-series-chart.js";
 
 @customElement("spinder-home-page")
 export class SpinderHomePage extends SpinderAppProvider {
@@ -30,6 +31,7 @@ export class SpinderHomePage extends SpinderAppProvider {
         <spinder-filters></spinder-filters>
         <spinder-csv-upload></spinder-csv-upload>
         <spinder-buckets></spinder-buckets>
+        <spinder-time-series-chart></spinder-time-series-chart>
         <spinder-pagination-table></spinder-pagination-table>
       </main>
       <spinder-footer></spinder-footer>
