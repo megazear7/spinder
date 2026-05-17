@@ -14,6 +14,7 @@ import "./page.home.js";
 import "./page.csv-help.js";
 import "./page.security.js";
 import "./page.not-found.js";
+import "./page.insights.js";
 import "./component.toast.js";
 import "./component.save-indicator.js";
 
@@ -98,6 +99,10 @@ export class SpinderApp extends LitElement {
               return html`
                 <div class="app-bar"></div>
                 <spinder-security-page></spinder-security-page>
+              `;
+            case RouteName.enum.insights:
+              return html`
+                <spinder-insights-page></spinder-insights-page>
               `;
             default:
               return html`

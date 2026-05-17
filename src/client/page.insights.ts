@@ -2,15 +2,13 @@ import { css, html, TemplateResult } from "lit";
 import { customElement } from "lit/decorators.js";
 import { globalStyles } from "./styles.global.js";
 import { SpinderAppProvider } from "./provider.app.js";
-import "./component.csv-upload.js";
-import "./component.pagination-table.js";
-import "./component.buckets.js";
 import "./component.filters.js";
 import "./component.footer.js";
 import "./component.nav.js";
+import "./component.time-series-chart.js";
 
-@customElement("spinder-home-page")
-export class SpinderHomePage extends SpinderAppProvider {
+@customElement("spinder-insights-page")
+export class SpinderInsightsPage extends SpinderAppProvider {
   static override styles = [
     globalStyles,
     css`
@@ -18,8 +16,8 @@ export class SpinderHomePage extends SpinderAppProvider {
         text-align: center;
       }
 
-      h1 img {
-        height: 100px;
+      h1 {
+        margin-top: 0;
       }
     `,
   ];
@@ -28,11 +26,9 @@ export class SpinderHomePage extends SpinderAppProvider {
     return html`
       <spinder-nav></spinder-nav>
       <main>
-        <h1 title="Spinder"><img src="logo/logo-text.png" /></h1>
+        <h1>Insights</h1>
         <spinder-filters></spinder-filters>
-        <spinder-csv-upload></spinder-csv-upload>
-        <spinder-buckets></spinder-buckets>
-        <spinder-pagination-table></spinder-pagination-table>
+        <spinder-time-series-chart></spinder-time-series-chart>
       </main>
       <spinder-footer></spinder-footer>
     `;
