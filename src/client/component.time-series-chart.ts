@@ -278,10 +278,19 @@ export class SpinderTimeSeriesChart extends LitElement {
   private canvasEl?: HTMLCanvasElement;
 
   private chartInstance: Chart | null = null;
+  private chartRenderPending = false;
 
   override connectedCallback(): void {
     super.connectedCallback();
     this.buckets = loadBuckets();
+  }
+
+  override disconnectedCallback(): void {
+    super.disconnectedCallback();
+    if (this.chartInstance) {
+      this.chartInstance.destroy();
+      this.chartInstance = null;
+    }
   }
 
   override updated(changedProps: PropertyValues): void {
@@ -293,9 +302,17 @@ export class SpinderTimeSeriesChart extends LitElement {
       changedProps.has("granularity") ||
       changedProps.has("chartMode")
     ) {
-      // Defer to next animation frame so the canvas element has been laid out
-      // and Chart.js can read its pixel dimensions correctly.
-      requestAnimationFrame(() => this.renderChart());
+      // Schedule chart render. Use double-rAF so Shadow DOM styles are fully
+      // applied and the canvas has its layout dimensions before Chart.js reads them.
+      if (!this.chartRenderPending) {
+        this.chartRenderPending = true;
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            this.chartRenderPending = false;
+            this.renderChart();
+          }),
+        );
+      }
     }
   }
 
@@ -304,8 +321,13 @@ export class SpinderTimeSeriesChart extends LitElement {
     let filtered = transactions.filter((tx) => tx.amount < 0);
 
     if (this.timeFilterContext?.startDate && this.timeFilterContext?.endDate) {
-      const start = this.timeFilterContext.startDate;
-      const end = this.timeFilterContext.endDate;
+      // Normalise both ends to whole-day boundaries so that date-only posting
+      // dates (stored as UTC midnight "YYYY-MM-DD") are not accidentally
+      // excluded by a start time later in the day.
+      const start = new Date(this.timeFilterContext.startDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(this.timeFilterContext.endDate);
+      end.setHours(23, 59, 59, 999);
       filtered = filtered.filter((tx) => {
         const d = new Date(tx.postingDate);
         return d >= start && d <= end;
@@ -407,6 +429,23 @@ export class SpinderTimeSeriesChart extends LitElement {
 
   private renderChart(): void {
     if (!this.canvasEl) return;
+
+    // Explicitly set canvas dimensions from the wrapper so Chart.js gets the
+    // correct size in Shadow DOM (where CSS layout may not yet be readable via
+    // the normal responsive-resize path).
+    const wrapper = this.shadowRoot?.querySelector(".canvas-wrapper") as HTMLElement | null;
+    const wrapperWidth = wrapper?.clientWidth ?? 0;
+
+    if (wrapperWidth === 0) {
+      // Layout hasn't been computed yet – retry on the next animation frame.
+      requestAnimationFrame(() => this.renderChart());
+      return;
+    }
+
+    if (wrapper) {
+      this.canvasEl.width = wrapperWidth;
+      this.canvasEl.height = wrapper.clientHeight || 220;
+    }
 
     const transactions = this.getFilteredTransactions();
 
