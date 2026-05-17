@@ -18,6 +18,7 @@ import { UpdateTimeFilterEvent } from "./event.update-time-filter.js";
 import { UpdateBucketFilterEvent } from "./event.update-bucket-filter.js";
 import {
   Chart,
+  BarController,
   CategoryScale,
   LinearScale,
   PointElement,
@@ -31,7 +32,18 @@ import {
   ChartOptions,
 } from "chart.js";
 
-Chart.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler);
+Chart.register(
+  BarController,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler,
+);
 
 type Granularity = "day" | "week" | "month" | "year";
 
@@ -306,13 +318,50 @@ export class SpinderTimeSeriesChart extends LitElement {
       // applied and the canvas has its layout dimensions before Chart.js reads them.
       if (!this.chartRenderPending) {
         this.chartRenderPending = true;
-        requestAnimationFrame(() =>
-          requestAnimationFrame(() => {
-            this.chartRenderPending = false;
-            this.renderChart();
-          }),
-        );
+        requestAnimationFrame(() => requestAnimationFrame(() => this.renderChart()));
       }
+    }
+  }
+
+  private renderChart(): void {
+    if (!this.canvasEl) {
+      this.chartRenderPending = false;
+      return;
+    }
+
+    // Explicitly set canvas dimensions from the wrapper so Chart.js gets the
+    // correct size in Shadow DOM (where CSS layout may not yet be readable via
+    // the normal responsive-resize path).
+    const wrapper = this.shadowRoot?.querySelector(".canvas-wrapper") as HTMLElement | null;
+    const wrapperWidth = wrapper?.clientWidth ?? 0;
+
+    if (wrapperWidth === 0) {
+      // Layout hasn't been computed yet – retry on the next animation frame.
+      // chartRenderPending remains true to block a concurrent render from starting.
+      requestAnimationFrame(() => this.renderChart());
+      return;
+    }
+
+    // Clear the pending flag before doing the actual render so that context
+    // updates that arrive while we render will schedule a fresh pass.
+    this.chartRenderPending = false;
+
+    if (wrapper) {
+      this.canvasEl.width = wrapperWidth;
+      this.canvasEl.height = wrapper.clientHeight || 220;
+    }
+
+    const transactions = this.getFilteredTransactions();
+
+    if (this.chartInstance) {
+      this.chartInstance.destroy();
+      this.chartInstance = null;
+    }
+
+    if (this.chartMode === "trend") {
+      this.renderTrendChart(transactions);
+    } else {
+      this.renderBucketsChart();
     }
   }
 
@@ -425,40 +474,6 @@ export class SpinderTimeSeriesChart extends LitElement {
     }
 
     return result.filter((b) => b.amount > 0).sort((a, b) => b.amount - a.amount);
-  }
-
-  private renderChart(): void {
-    if (!this.canvasEl) return;
-
-    // Explicitly set canvas dimensions from the wrapper so Chart.js gets the
-    // correct size in Shadow DOM (where CSS layout may not yet be readable via
-    // the normal responsive-resize path).
-    const wrapper = this.shadowRoot?.querySelector(".canvas-wrapper") as HTMLElement | null;
-    const wrapperWidth = wrapper?.clientWidth ?? 0;
-
-    if (wrapperWidth === 0) {
-      // Layout hasn't been computed yet – retry on the next animation frame.
-      requestAnimationFrame(() => this.renderChart());
-      return;
-    }
-
-    if (wrapper) {
-      this.canvasEl.width = wrapperWidth;
-      this.canvasEl.height = wrapper.clientHeight || 220;
-    }
-
-    const transactions = this.getFilteredTransactions();
-
-    if (this.chartInstance) {
-      this.chartInstance.destroy();
-      this.chartInstance = null;
-    }
-
-    if (this.chartMode === "trend") {
-      this.renderTrendChart(transactions);
-    } else {
-      this.renderBucketsChart();
-    }
   }
 
   private renderTrendChart(transactions: Transaction[]): void {
